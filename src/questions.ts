@@ -1,5 +1,5 @@
 import inquirer from 'inquirer'
-import { Answers, Provider } from './types'
+import { Answers, Provider, Credentials } from './types'
 
 export const questionsWithLogin = async (
     provider: Provider
@@ -29,7 +29,7 @@ export const questionsIfCachedLogin = async (
         {
             name: 'repoName',
             message: `What is the name of your new ${provider} repo?`,
-            type: 'password'
+            type: 'input'
         }
     ])
 }

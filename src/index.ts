@@ -3,16 +3,15 @@ import figlet from 'figlet'
 import chalk from 'chalk'
 import commander from 'commander'
 import { Provider, DATAPATH, Credentials, Answers } from './types'
-import { checkCache, writeToCache } from './util'
-import { questionsWithLogin } from './questions'
+import {
+    checkCache,
+    writeToCache,
+    hasCredentials,
+    bitbucketCreate
+} from './util'
+import { questionsWithLogin, questionsIfCachedLogin } from './questions'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
-
-writeToCache(<Credentials>{
-    username: '11grossmane',
-    password: 'something'
-})
-checkCache()
 
 commander
     .version('1.0.0')
@@ -36,16 +35,55 @@ const cli = async (): Promise<void> => {
         )
         return
     }
-    console.log(`you have set your remote to: ${provider}`)
-    const credentials: Credentials | null = checkCache()
 
-    if (!credentials) {
+    console.log(`your remote provider is set to: ${provider}`)
+    let credentials = checkCache()
+
+    let repoName: string
+    if (!hasCredentials(credentials, provider, commander.reset)) {
         const answers: Answers = await questionsWithLogin(provider)
-        writeToCache(<Credentials>{
-            username: answers.username,
-            password: answers.password
-        })
-        //TODO call github repo
+        credentials = <Credentials>{
+            [provider]: {
+                username: answers.username,
+                password: answers.password
+            }
+        }
+        writeToCache(credentials)
+        repoName = answers.repoName
+    } else {
+        console.log(
+            chalk.yellow(
+                `You are logged in with the username: ${chalk.green(
+                    `${credentials && credentials[provider]?.username}`
+                )}.  \nIf you would like to change your login credentials, please run again with the -r flag.`
+            )
+        )
+        const answers: Answers = await questionsIfCachedLogin(provider)
+        repoName = answers.repoName
     }
+
+    credentials = <Credentials>credentials
+    //calling bitbucket
+    if (provider == Provider.BITBUCKET && credentials.Bitbucket) {
+        try {
+            const res = await bitbucketCreate(credentials.Bitbucket, repoName)
+            console.log(
+                chalk.green(`repo successfully created\nname: ${res.repoName}`)
+            )
+            console.log(
+                chalk.magenta(
+                    `set your remote repo with:\ngit remote add origin <${res.links[0]}>\nOR\ngit remote add origin <${res.links[1]}>`
+                )
+            )
+        } catch (e) {
+            console.error(
+                chalk.red(
+                    `status: ${e.response.status},\nmessage:${e.response.data.error.message}`
+                )
+            )
+        }
+    }
+    //TODO start over if repo is already created
+    //TODO call github api
 }
 cli()

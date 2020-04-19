@@ -10,7 +10,8 @@
         "create": "npm run build && npm run global",
         "build": "npm run clean && tsc -p .",
         "global": "npm i -g",
-        "start": "ts-node ./src/index.ts",
+        "start-reset": "ts-node ./src/index.ts -g -r",
+        "start": "ts-node ./src/index.ts -g",
         "clean": "rm -rf ./lib",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
     },
@@ -18,22 +19,26 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@types/typescript": "^2.0.0",
+        "axios": "^0.19.2",
         "chalk": "^4.0.0",
         "commander": "^5.0.0",
         "figlet": "^1.3.0",
         "inquirer": "^7.1.0",
         "js-yaml": "^3.13.1",
         "puppeteer": "^3.0.0",
+        "slugify": "^1.4.0",
         "typescript": "^3.8.3"
     },
     "devDependencies": {
-        "@types/js-yaml": "^3.12.3",
-        "@types/yaml": "^1.2.0",
+        "@types/axios": "^0.14.0",
         "@types/chalk": "^2.2.0",
         "@types/commander": "^2.12.2",
         "@types/figlet": "^1.2.0",
         "@types/inquirer": "^6.5.0",
+        "@types/js-yaml": "^3.12.3",
         "@types/node": "^13.13.0",
-        "@types/puppeteer": "^2.0.1"
+        "@types/puppeteer": "^2.0.1",
+        "@types/yaml": "^1.2.0"
     }
 }
