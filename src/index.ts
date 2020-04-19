@@ -72,7 +72,7 @@ const cli = async (): Promise<void> => {
         } catch (e) {
             console.error(
                 chalk.red(
-                    `status: ${e.response.status},\nmessage:${e.response.data.error.message}`
+                    `status: ${e.response.status},\nmessage: ${e.response.data.error.message}`
                 )
             )
             return
@@ -83,7 +83,7 @@ const cli = async (): Promise<void> => {
         } catch (e) {
             console.error(
                 chalk.red(
-                    `status: ${e.response.status},\nmessage:${e.response.data.error.message}`
+                    `status: ${e.response.status},\nmessage: ${e.response.data.errors[0].message}`
                 )
             )
             return
