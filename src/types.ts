@@ -29,7 +29,12 @@ export const BITBUCKET_URL = (username: string, repoName: string): string => {
     return `https://api.bitbucket.org/2.0/repositories/${username}/${repoName}`
 }
 
-export interface BitbucketPostResponse {
+export interface PostResponse {
+    repoName: string
+    links: string[]
+    statusCode: number
+}
+export interface PostResponse {
     repoName: string
     links: string[]
     statusCode: number

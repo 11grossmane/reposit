@@ -7,7 +7,9 @@ import {
     DATAPATH,
     BITBUCKET_URL,
     BitbucketCredentials,
-    BitbucketPostResponse
+    PostResponse,
+    GITHUB_REPO_URL,
+    GithubCredentials
 } from './types'
 import slugify from 'slugify'
 
@@ -48,9 +50,8 @@ export const hasCredentials = (
 export const bitbucketCreate = async (
     credentials: BitbucketCredentials,
     repoName: string
-): Promise<BitbucketPostResponse> => {
+): Promise<PostResponse> => {
     const slugifiedRepoName = slugify(repoName.toLowerCase())
-    console.log(slugifiedRepoName)
     try {
         const { data, status } = await axios.post(
             BITBUCKET_URL(credentials.username, slugifiedRepoName),
@@ -65,6 +66,32 @@ export const bitbucketCreate = async (
         return {
             repoName: data.name,
             links: [data.links.clone[0].href, data.links.clone[1].href],
+            statusCode: status
+        }
+    } catch (e) {
+        throw e
+    }
+}
+export const githubCreate = async (
+    credentials: GithubCredentials,
+    repoName: string
+): Promise<PostResponse> => {
+    try {
+        const { data, status } = await axios.post(
+            GITHUB_REPO_URL,
+            {
+                name: `${repoName}`
+            },
+            {
+                auth: {
+                    username: credentials.username,
+                    password: credentials.password
+                }
+            }
+        )
+        return {
+            repoName: data.name,
+            links: [data.clone_url, data.ssh_url],
             statusCode: status
         }
     } catch (e) {

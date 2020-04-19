@@ -2,7 +2,7 @@
 import figlet from 'figlet'
 import chalk from 'chalk'
 import commander from 'commander'
-import { Provider, DATAPATH, Credentials, Answers } from './types'
+import { Provider, DATAPATH, Credentials, Answers, PostResponse } from './types'
 import {
     checkCache,
     writeToCache,
@@ -10,6 +10,7 @@ import {
     bitbucketCreate
 } from './util'
 import { questionsWithLogin, questionsIfCachedLogin } from './questions'
+import { githubCreate } from './util'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
 
@@ -64,29 +65,42 @@ const cli = async (): Promise<void> => {
 
     credentials = <Credentials>credentials
     //calling bitbucket
+    let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
     if (provider == Provider.BITBUCKET && credentials.Bitbucket) {
         try {
-            const res = await bitbucketCreate(credentials.Bitbucket, repoName)
-            console.log(
-                chalk.green(
-                    `Repo successfully created!\nRepo Name: ${res.repoName}`
-                )
-            )
-            console.log(chalk.yellowBright('---------------'))
-            console.log(
-                chalk.magentaBright(
-                    `Set your remote repo with https: \ngit remote add origin ${res.links[0]} \nOr ssh:\ngit remote add origin ${res.links[1]}`
-                )
-            )
+            res = await bitbucketCreate(credentials.Bitbucket, repoName)
         } catch (e) {
             console.error(
                 chalk.red(
                     `status: ${e.response.status},\nmessage:${e.response.data.error.message}`
                 )
             )
+            return
+        }
+    } else if (provider == Provider.GITHUB && credentials.Github) {
+        try {
+            res = await githubCreate(credentials.Github, repoName)
+        } catch (e) {
+            console.error(
+                chalk.red(
+                    `status: ${e.response.status},\nmessage:${e.response.data.error.message}`
+                )
+            )
+            return
         }
     }
+    console.log(
+        chalk.green(`Repo successfully created!\nRepo Name: ${res.repoName}`)
+    )
+    console.log(chalk.yellowBright('---------------'))
+    console.log(
+        chalk.magentaBright(
+            `Set your remote repo with https: \ngit remote add origin ${res.links[0]} \nOr ssh:\ngit remote add origin ${res.links[1]}`
+        )
+    )
+
     //TODO start over if repo is already created
+    //TODO handle wrong username and password error
     //TODO call github api
 }
 cli()
