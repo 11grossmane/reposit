@@ -155,6 +155,6 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         )
     )
 
-    //TODO make comments
+    //TODO make README.md
 }
 cli()

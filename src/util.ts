@@ -28,8 +28,22 @@ export const checkCache = (): Credentials | null => {
     }
 }
 
-export const writeToCache = (credentials: Credentials): void => {
-    const yamlString = yaml.safeDump(credentials)
+export const writeToCache = (newCredentials: Credentials): void => {
+    let oldCredentials = checkCache()
+    if (oldCredentials) {
+        const yamlString = yaml.safeDump(
+            {
+                ...oldCredentials,
+                ...newCredentials
+            },
+            {
+                noRefs: true
+            }
+        )
+        fs.writeFileSync(DATAPATH, yamlString)
+        return
+    }
+    const yamlString = yaml.safeDump(newCredentials)
     fs.writeFileSync(DATAPATH, yamlString)
 }
 
