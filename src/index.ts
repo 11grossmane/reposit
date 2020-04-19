@@ -68,11 +68,14 @@ const cli = async (): Promise<void> => {
         try {
             const res = await bitbucketCreate(credentials.Bitbucket, repoName)
             console.log(
-                chalk.green(`repo successfully created\nname: ${res.repoName}`)
+                chalk.green(
+                    `Repo successfully created!\nRepo Name: ${res.repoName}`
+                )
             )
+            console.log(chalk.yellowBright('---------------'))
             console.log(
-                chalk.magenta(
-                    `set your remote repo with:\ngit remote add origin <${res.links[0]}>\nOR\ngit remote add origin <${res.links[1]}>`
+                chalk.magentaBright(
+                    `Set your remote repo with https:\ngit remote add origin <${res.links[0]}>\nOr ssh:\ngit remote add origin <${res.links[1]}>`
                 )
             )
         } catch (e) {

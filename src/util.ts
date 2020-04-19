@@ -49,7 +49,8 @@ export const bitbucketCreate = async (
     credentials: BitbucketCredentials,
     repoName: string
 ): Promise<BitbucketPostResponse> => {
-    const slugifiedRepoName = slugify(repoName)
+    const slugifiedRepoName = slugify(repoName.toLowerCase())
+    console.log(slugifiedRepoName)
     try {
         const { data, status } = await axios.post(
             BITBUCKET_URL(credentials.username, slugifiedRepoName),
