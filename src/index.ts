@@ -82,7 +82,7 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     }
 
     //Typecasting to make sure credentials is not null
-    credentials = <Credentials>{ credentials }
+    credentials = <Credentials>credentials
 
     let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
 
@@ -119,7 +119,6 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     else if (provider == Provider.GITHUB && credentials.Github) {
         try {
             res = await githubCreate(credentials.Github, repoName)
-            console.log(res.statusCode)
         } catch (e) {
             if (e.response.status === 401) {
                 console.error(chalk.red('wrong login credentials'))
