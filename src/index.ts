@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 import figlet from 'figlet'
 import chalk from 'chalk'
+import slugify from 'slugify'
 import commander from 'commander'
-import { Provider, DATAPATH, Credentials, Answers, PostResponse } from './types'
+import {
+    Provider,
+    DATAPATH,
+    Credentials,
+    Answers,
+    PostResponse,
+    InternalArgs
+} from './types'
 import {
     checkCache,
     writeToCache,
@@ -22,26 +30,34 @@ commander
     .option('-r, --reset', 'remove login credentials from cache')
     .parse(process.argv)
 
-const cli = async (): Promise<void> => {
+const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     let provider: Provider
-    if (commander.github && !commander.bitbucket) {
-        provider = Provider.GITHUB
-    } else if (commander.bitbucket && !commander.github) {
-        provider = Provider.BITBUCKET
+    let reset: boolean
+    if (internalArgs) {
+        provider = internalArgs.provider
+        reset = internalArgs.reset
     } else {
-        console.log(
-            chalk.yellow(
-                'please use either the -g flag for github, OR the -b flag for bitbucket'
+        reset = commander.reset
+        if (commander.github && !commander.bitbucket) {
+            provider = Provider.GITHUB
+        } else if (commander.bitbucket && !commander.github) {
+            provider = Provider.BITBUCKET
+        } else {
+            console.log(
+                chalk.yellow(
+                    'please use either the -g flag for github, OR the -b flag for bitbucket.  Use -h flag for more options.'
+                )
             )
-        )
-        return
+            return
+        }
     }
 
     console.log(`your remote provider is set to: ${provider}`)
     let credentials = checkCache()
-
     let repoName: string
-    if (!hasCredentials(credentials, provider, commander.reset)) {
+
+    //If user does not have cached credentials, or he has used -r flag, ask for credential and then cache them
+    if (!hasCredentials(credentials, provider, reset)) {
         const answers: Answers = await questionsWithLogin(provider)
         credentials = <Credentials>{
             [provider]: {
@@ -51,7 +67,9 @@ const cli = async (): Promise<void> => {
         }
         writeToCache(credentials)
         repoName = answers.repoName
-    } else {
+    }
+    //otherwise, only ask for repo name
+    else {
         console.log(
             chalk.yellow(
                 `You are logged in with the username: ${chalk.green(
@@ -63,32 +81,71 @@ const cli = async (): Promise<void> => {
         repoName = answers.repoName
     }
 
-    credentials = <Credentials>credentials
-    //calling bitbucket
+    //Typecasting to make sure credentials is not null
+    credentials = <Credentials>{ credentials }
+
     let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
+
+    //Provider is Bitbucket
     if (provider == Provider.BITBUCKET && credentials.Bitbucket) {
         try {
             res = await bitbucketCreate(credentials.Bitbucket, repoName)
         } catch (e) {
-            console.error(
-                chalk.red(
-                    `status: ${e.response.status},\nmessage: ${e.response.data.error.message}`
+            if (e.response.status === 401) {
+                console.error(chalk.red('wrong login credentials'))
+                cli({ reset: true, provider: provider })
+                return
+            } else if (e.response.status === 400) {
+                console.error(
+                    chalk.red(
+                        `You already have a repo called ${repoName}. \nTry a different repo name.`
+                    )
                 )
-            )
-            return
-        }
-    } else if (provider == Provider.GITHUB && credentials.Github) {
-        try {
-            res = await githubCreate(credentials.Github, repoName)
-        } catch (e) {
-            console.error(
-                chalk.red(
-                    `status: ${e.response.status},\nmessage: ${e.response.data.errors[0].message}`
+                cli({ reset: false, provider: provider })
+                return
+            } else {
+                console.error(
+                    chalk.red(
+                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}`
+                    )
                 )
-            )
-            return
+                cli({ reset: true, provider: provider })
+                return
+            }
         }
     }
+
+    //Provider is Github
+    else if (provider == Provider.GITHUB && credentials.Github) {
+        try {
+            res = await githubCreate(credentials.Github, repoName)
+            console.log(res.statusCode)
+        } catch (e) {
+            if (e.response.status === 401) {
+                console.error(chalk.red('wrong login credentials'))
+                cli({ reset: true, provider: provider })
+                return
+            } else if (e.response.status === 422) {
+                console.error(
+                    chalk.red(
+                        `You already have a repo called ${repoName}\nTry a different repo name.`
+                    )
+                )
+                cli({ reset: false, provider: provider })
+                return
+            } else {
+                console.error(
+                    chalk.red(
+                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.message}`
+                    )
+                )
+                cli({ reset: true, provider: provider })
+                return
+            }
+        }
+    }
+
+    //Success!
     console.log(
         chalk.green(`Repo successfully created!\nRepo Name: ${res.repoName}`)
     )
@@ -99,8 +156,6 @@ const cli = async (): Promise<void> => {
         )
     )
 
-    //TODO start over if repo is already created
-    //TODO handle wrong username and password error
-    //TODO call github api
+    //TODO make comments
 }
 cli()

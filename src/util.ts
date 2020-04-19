@@ -18,10 +18,14 @@ export const clearCache = (): void => {
 }
 
 export const checkCache = (): Credentials | null => {
-    const credentials: Credentials = yaml.safeLoad(
-        fs.readFileSync(DATAPATH, 'utf8')
-    )
-    return credentials
+    try {
+        const credentials: Credentials = yaml.safeLoad(
+            fs.readFileSync(DATAPATH, 'utf8')
+        )
+        return credentials
+    } catch (e) {
+        return null
+    }
 }
 
 export const writeToCache = (credentials: Credentials): void => {

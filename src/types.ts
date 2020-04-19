@@ -40,4 +40,9 @@ export interface PostResponse {
     statusCode: number
 }
 
+export interface InternalArgs {
+    reset: boolean
+    provider: Provider
+}
+
 export const DATAPATH = __dirname + '/../data/login.yaml'
