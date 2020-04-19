@@ -75,7 +75,7 @@ const cli = async (): Promise<void> => {
             console.log(chalk.yellowBright('---------------'))
             console.log(
                 chalk.magentaBright(
-                    `Set your remote repo with https:\ngit remote add origin <${res.links[0]}>\nOr ssh:\ngit remote add origin <${res.links[1]}>`
+                    `Set your remote repo with https: \ngit remote add origin ${res.links[0]} \nOr ssh:\ngit remote add origin ${res.links[1]}`
                 )
             )
         } catch (e) {
