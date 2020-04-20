@@ -20,7 +20,7 @@ import {
 import { questionsWithLogin, questionsIfCachedLogin } from './questions'
 import { githubCreate } from './util'
 
-console.log(chalk.blue(figlet.textSync('Reposit\n')))
+console.log(chalk.blueBright(figlet.textSync('Reposit\n')))
 
 commander
     .version('1.0.0')
