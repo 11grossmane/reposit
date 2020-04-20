@@ -52,7 +52,7 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         }
     }
 
-    console.log(`your remote provider is set to: ${provider}`)
+    console.log(`your remote provider is set to: ${provider}\n`)
     let credentials = checkCache()
     let repoName: string
 
@@ -74,7 +74,7 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             chalk.yellow(
                 `You are logged in with the username: ${chalk.green(
                     `${credentials && credentials[provider]?.username}`
-                )}.  \nIf you would like to change your login credentials, please run again with the -r flag.`
+                )}.  \nIf you would like to change your login credentials, please run again with the -r flag.\n`
             )
         )
         const answers: Answers = await questionsIfCachedLogin(provider)
@@ -146,13 +146,14 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
 
     //Success!
     console.log(
-        chalk.green(`Repo successfully created!\nRepo Name: ${res.repoName}`)
-    )
-    console.log(chalk.yellowBright('---------------'))
-    console.log(
-        chalk.magentaBright(
-            `Set your remote repo with https: \ngit remote add origin ${res.links[0]} \nOr ssh:\ngit remote add origin ${res.links[1]}`
+        chalk.green(
+            `\nRepo successfully created!\nRepo Name: ${res.repoName}\n`
         )
+    )
+    console.log(
+        `Set your remote repo with https: \n${chalk.bold(
+            `git remote add origin ${res.links[0]}`
+        )} \nOr ssh:\n${chalk.bold(`git remote add origin ${res.links[1]}`)}`
     )
 
     //TODO make README.md
