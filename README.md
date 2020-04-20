@@ -10,7 +10,7 @@ npm i -g reposit
 
 ## Usage
 
-> \*\*Note: reposit currently only supports github and bitbucket,
+> \*\*Note: reposit currently only supports Github and Bitbucket,
 > and therefore must be run with -g flag, or -b flag
 
 #### Create Github Repo
@@ -24,6 +24,10 @@ reposit -g
 ```bash
 reposit -b
 ```
+
+#### Screenshot
+
+![reposit-screenshot](reposit-example-usage.png)
 
 #### Resetting Login Information
 
