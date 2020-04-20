@@ -27,7 +27,7 @@ reposit -b
 
 #### Screenshot
 
-![reposit-screenshot](reposit-example-usage.png)
+![reposit-screenshot](reposit-example-usage-edited.png)
 
 #### Resetting Login Information
 
