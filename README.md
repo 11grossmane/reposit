@@ -29,7 +29,7 @@ reposit -b
 
 #### Screenshot
 
-![reposit-screenshot](reposit-example-usage-edited.png)
+![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
 
 #### Resetting Login Information
 
