@@ -1,6 +1,8 @@
 # reposit
 
-> Create remote repositories from the command
+[![Build Status](https://travis-ci.org/11grossmane/reposit.svg?branch=master)](https://travis-ci.org/11grossmane/reposit)
+
+> Create remote repositories from the command line
 
 ## Install
 

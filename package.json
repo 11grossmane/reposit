@@ -16,7 +16,8 @@
         "bitbucket-reset": "ts-node ./src/index.ts -b -r",
         "clean": "find ./lib ! -name '.gitignore' -type f -exec rm -f {} + && rm -f ./data/login.yaml",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
-        "push-both": "git push bitbucket master && git push"
+        "push-both": "git push bitbucket master && git push",
+        "test": "npm run build"
     },
     "keywords": [],
     "author": "",
