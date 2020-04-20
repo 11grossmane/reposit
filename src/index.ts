@@ -132,6 +132,11 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
                 )
                 cli({ reset: false, provider: provider })
                 return
+            } else if (e.response.status === 403) {
+                console.error(
+                    chalk.red(`Request limit exceeded.  Try again in one hour.`)
+                )
+                return
             } else {
                 console.error(
                     chalk.red(
