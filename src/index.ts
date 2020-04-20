@@ -92,13 +92,13 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             res = await bitbucketCreate(credentials.Bitbucket, repoName)
         } catch (e) {
             if (e.response.status === 401) {
-                console.error(chalk.red('wrong login credentials'))
+                console.error(chalk.red('wrong login credentials\n'))
                 cli({ reset: true, provider: provider })
                 return
             } else if (e.response.status === 400) {
                 console.error(
                     chalk.red(
-                        `You already have a repo called ${repoName}. \nTry a different repo name.`
+                        `You already have a repo called ${repoName}. \nTry a different repo name.\n`
                     )
                 )
                 cli({ reset: false, provider: provider })
@@ -106,7 +106,7 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             } else {
                 console.error(
                     chalk.red(
-                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}`
+                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}\n`
                     )
                 )
                 cli({ reset: true, provider: provider })
@@ -121,26 +121,28 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             res = await githubCreate(credentials.Github, repoName)
         } catch (e) {
             if (e.response.status === 401) {
-                console.error(chalk.red('wrong login credentials'))
+                console.error(chalk.red('wrong login credentials\n'))
                 cli({ reset: true, provider: provider })
                 return
             } else if (e.response.status === 422) {
                 console.error(
                     chalk.red(
-                        `You already have a repo called ${repoName}\nTry a different repo name.`
+                        `You already have a repo called ${repoName}\nTry a different repo name.\n`
                     )
                 )
                 cli({ reset: false, provider: provider })
                 return
             } else if (e.response.status === 403) {
                 console.error(
-                    chalk.red(`Request limit exceeded.  Try again in one hour.`)
+                    chalk.red(
+                        `Request limit exceeded.  Try again in one hour.\n`
+                    )
                 )
                 return
             } else {
                 console.error(
                     chalk.red(
-                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.message}`
+                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.message}\n`
                     )
                 )
                 cli({ reset: true, provider: provider })

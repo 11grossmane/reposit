@@ -1,6 +1,6 @@
 {
     "name": "reposit",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "",
     "main": "./lib/index.js",
     "bin": {
@@ -17,7 +17,8 @@
         "clean": "find ./lib ! -name '.gitignore' -type f -exec rm -f {} + && rm -f ./data/login.yaml",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
         "push-both": "git push bitbucket master && git push",
-        "test": "npm run build"
+        "test": "npm run build",
+        "build-publish": "npm run build && npm publish"
     },
     "keywords": [],
     "author": "",
