@@ -1,11 +1,14 @@
 {
   "name": "reposit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "./lib/index.js",
   "bin": {
     "reposit": "./lib/index.js"
   },
+  "files": [
+    "/ib/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/11grossmane/reposit.git"
