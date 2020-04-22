@@ -4,6 +4,8 @@
 
 > Create remote repositories from the command line
 
+![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
+
 ## Install
 
 ```bash
@@ -26,10 +28,6 @@ reposit -g
 ```bash
 reposit -b
 ```
-
-#### Screenshot
-
-![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
 
 #### Resetting Login Information
 
