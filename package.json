@@ -7,7 +7,7 @@
     "reposit": "./lib/index.js"
   },
   "files": [
-    "/ib/**/*"
+    "/lib/**/*"
   ],
   "repository": {
     "type": "git",
