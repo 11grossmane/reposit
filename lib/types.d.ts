@@ -20,6 +20,8 @@ export declare enum Provider {
     BITBUCKET = "Bitbucket"
 }
 export declare const GITHUB_REPO_URL = "https://api.github.com/user/repos";
+export declare const GITHUB_LOGIN_URL = "https://api.github.com/user";
+export declare const BITBUCKET_LOGIN_URL = "https://api.bitbucket.org/2.0/user";
 export declare const BITBUCKET_URL: (username: string, repoName: string) => string;
 export interface PostResponse {
     repoName: string;

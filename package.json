@@ -1,6 +1,6 @@
 {
     "name": "reposit",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "",
     "main": "./lib/index.js",
     "bin": {
@@ -29,8 +29,8 @@
         "build-publish": "npm run build && npm publish"
     },
     "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "author": "11grossmane",
+    "license": "MIT",
     "dependencies": {
         "axios": "^0.19.2",
         "chalk": "^4.0.0",

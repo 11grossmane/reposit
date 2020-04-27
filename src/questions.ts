@@ -16,28 +16,28 @@ export const loginQuestions = async (provider: Provider): Promise<Answers> => {
     ])
 }
 
-export const questionsWithLogin = async (
-    provider: Provider
-): Promise<Answers> => {
-    return await inquirer.prompt([
-        {
-            name: 'username',
-            message: `${provider} username: `,
-            type: 'input'
-        },
-        {
-            name: 'password',
-            message: `${provider} password: `,
-            type: 'password'
-        },
-        {
-            name: 'repoName',
-            message: `What is the name of your new ${provider} repo?`,
-            type: 'input'
-        }
-    ])
-}
-export const questionsIfCachedLogin = async (
+// export const questionsWithLogin = async (
+//     provider: Provider
+// ): Promise<Answers> => {
+//     return await inquirer.prompt([
+//         {
+//             name: 'username',
+//             message: `${provider} username: `,
+//             type: 'input'
+//         },
+//         {
+//             name: 'password',
+//             message: `${provider} password: `,
+//             type: 'password'
+//         },
+//         {
+//             name: 'repoName',
+//             message: `What is the name of your new ${provider} repo?`,
+//             type: 'input'
+//         }
+//     ])
+// }
+export const repoNameQuestion = async (
     provider: Provider
 ): Promise<Answers> => {
     return await inquirer.prompt([

@@ -15,10 +15,11 @@ import {
     checkCache,
     writeToCache,
     hasCredentials,
-    bitbucketCreate
+    bitbucketCreate,
+    validateCredentials,
+    githubCreate
 } from './util'
-import { questionsWithLogin, questionsIfCachedLogin } from './questions'
-import { githubCreate } from './util'
+import { loginQuestions, repoNameQuestion } from './questions'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
 
@@ -54,32 +55,62 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
 
     console.log(`your remote provider is set to: ${provider}\n`)
     let credentials = checkCache()
-    let repoName: string
 
     //If user does not have cached credentials, or he has used -r flag, ask for credential and then cache them
     if (!hasCredentials(credentials, provider, reset)) {
-        const answers: Answers = await questionsWithLogin(provider)
+        const loginAnswers = await loginQuestions(provider)
+
         credentials = <Credentials>{
             [provider]: {
-                username: answers.username,
-                password: answers.password
+                username: loginAnswers.username,
+                password: loginAnswers.password
+            }
+        }
+        try {
+            if (provider === Provider.BITBUCKET && credentials.Bitbucket) {
+                await validateCredentials(credentials.Bitbucket, provider)
+            } else if (provider === Provider.GITHUB && credentials.Github) {
+                await validateCredentials(credentials.Github, provider)
+            } else {
+                let err = new Error(
+                    `Unknown Error with provider ${provider} and credentials ${credentials}`
+                )
+                err.name = 'Unknown'
+                throw err
+            }
+        } catch (e) {
+            if (e.name === 'Unknown') {
+                console.error(chalk.red(e))
+                cli({ reset: true, provider: provider })
+                return
+            } else if (e.response.status === 401) {
+                console.error(chalk.red('wrong login credentials\n'))
+                cli({ reset: true, provider: provider })
+                return
+            } else {
+                console.error(
+                    chalk.red(
+                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}\n`
+                    )
+                )
+                cli({ reset: true, provider: provider })
+                return
             }
         }
         writeToCache(credentials)
-        repoName = answers.repoName
     }
+
     //otherwise, only ask for repo name
-    else {
-        console.log(
-            chalk.yellow(
-                `You are logged in with the username: ${chalk.green(
-                    `${credentials && credentials[provider]?.username}`
-                )}.  \nIf you would like to change your login credentials, please run again with the -r flag.\n`
-            )
+    console.log(
+        chalk.yellow(
+            `You are logged in with the username: ${chalk.green(
+                `${credentials && credentials[provider]?.username}`
+            )}.  \nIf you would like to change your login credentials, please run again with the -r flag.\n`
         )
-        const answers: Answers = await questionsIfCachedLogin(provider)
-        repoName = answers.repoName
-    }
+    )
+
+    //asking for repo name
+    let { repoName } = await repoNameQuestion(provider)
 
     //Typecasting to make sure credentials is not null
     credentials = <Credentials>credentials
