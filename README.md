@@ -16,6 +16,10 @@ npm i -g reposit
 
 > \*\*Note: reposit currently only supports Github and Bitbucket,
 > and therefore must be run with -g flag, or -b flag
+- -b create bitbucket repo
+- -g create github repo
+- -r reset login credentials
+- -d delete repo (use with -g or -b to specify provider) 
 
 #### Create Github Repo
 
@@ -27,6 +31,18 @@ reposit -g
 
 ```bash
 reposit -b
+```
+
+#### Deleting Github Repo
+
+```bash
+reposit -g -d
+```
+
+#### Deleting Bitbucket Repo
+
+```bash
+reposit -b -d
 ```
 
 #### Resetting Login Information

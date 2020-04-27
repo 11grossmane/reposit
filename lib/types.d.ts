@@ -2,6 +2,7 @@ export interface Answers {
     username?: string;
     password?: string;
     repoName: string;
+    delete?: boolean;
 }
 export interface Credentials {
     Github?: GithubCredentials;
@@ -22,7 +23,8 @@ export declare enum Provider {
 export declare const GITHUB_REPO_URL = "https://api.github.com/user/repos";
 export declare const GITHUB_LOGIN_URL = "https://api.github.com/user";
 export declare const BITBUCKET_LOGIN_URL = "https://api.bitbucket.org/2.0/user";
-export declare const BITBUCKET_URL: (username: string, repoName: string) => string;
+export declare const BITBUCKET_REPO_URL: (username: string, repoName: string) => string;
+export declare const GITHUB_DELETE_URL: (username: string, repoName: string) => string;
 export interface PostResponse {
     repoName: string;
     links: string[];

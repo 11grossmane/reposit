@@ -8,3 +8,5 @@ export declare const bitbucketCreate: (credentials: BitbucketCredentials, repoNa
 export declare const throwUnknownError: (provider: Provider, credentials: Credentials) => never;
 export declare const handleError: (e: any, provider: Provider, repoName?: string) => void;
 export declare const githubCreate: (credentials: GithubCredentials, repoName: string) => Promise<PostResponse>;
+export declare const githubDelete: (credentials: GithubCredentials, repoName: string) => Promise<string | undefined>;
+export declare const bitbucketDelete: (credentials: GithubCredentials, repoName: string) => Promise<string | undefined>;

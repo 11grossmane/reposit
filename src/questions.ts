@@ -43,7 +43,7 @@ export const repoNameQuestion = async (
 ): Promise<Answers> => {
     let message = `What is the name of your new ${provider} repo?`
     if (toDelete === 'delete') {
-        message = `What is the name of the repo you would like to delete from ${provider}`
+        message = `What is the name of the repo you would like to \x1b[31mdelete\x1b[0m\u001b[1m from ${provider}`
     }
     return await inquirer.prompt([
         {
@@ -61,7 +61,7 @@ export const deleteQuestions = async (
     return await inquirer.prompt([
         {
             name: 'delete',
-            message: `Are you sure you want to delete your ${provider} repo: ${repoName}?  This action cannot be undone.`,
+            message: `Are you sure you want to \x1b[31mdelete\x1b[0m\u001b[1m your ${provider} repo: ${repoName}?  This action cannot be undone.`,
             type: 'confirm'
         }
     ])
