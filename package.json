@@ -16,7 +16,7 @@
     },
     "scripts": {
         "create": "npm run build && npm run global",
-        "build": "npm run clean && tsc -p .",
+        "build": "npm run clean && npm install && tsc -p .",
         "global": "npm i -g",
         "github-reset": "ts-node ./src/index.ts -g -r",
         "github": "ts-node ./src/index.ts -g",
