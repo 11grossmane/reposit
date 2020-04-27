@@ -17,7 +17,9 @@ import {
     hasCredentials,
     bitbucketCreate,
     validateCredentials,
-    githubCreate
+    githubCreate,
+    handleError,
+    throwUnknownError
 } from './util'
 import { loginQuestions, repoNameQuestion } from './questions'
 
@@ -31,7 +33,7 @@ commander
     .option('-r, --reset', 'remove login credentials from cache')
     .parse(process.argv)
 
-const cli = async (internalArgs?: InternalArgs): Promise<void> => {
+export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     let provider: Provider
     let reset: boolean
     if (internalArgs) {
@@ -72,30 +74,11 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             } else if (provider === Provider.GITHUB && credentials.Github) {
                 await validateCredentials(credentials.Github, provider)
             } else {
-                let err = new Error(
-                    `Unknown Error with provider ${provider} and credentials ${credentials}`
-                )
-                err.name = 'Unknown'
-                throw err
+                throwUnknownError(provider, credentials)
             }
         } catch (e) {
-            if (e.name === 'Unknown') {
-                console.error(chalk.red(e))
-                cli({ reset: true, provider: provider })
-                return
-            } else if (e.response.status === 401) {
-                console.error(chalk.red('wrong login credentials\n'))
-                cli({ reset: true, provider: provider })
-                return
-            } else {
-                console.error(
-                    chalk.red(
-                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}\n`
-                    )
-                )
-                cli({ reset: true, provider: provider })
-                return
-            }
+            handleError(e, provider)
+            return
         }
         writeToCache(credentials)
     }
@@ -122,27 +105,8 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         try {
             res = await bitbucketCreate(credentials.Bitbucket, repoName)
         } catch (e) {
-            if (e.response.status === 401) {
-                console.error(chalk.red('wrong login credentials\n'))
-                cli({ reset: true, provider: provider })
-                return
-            } else if (e.response.status === 400) {
-                console.error(
-                    chalk.red(
-                        `You already have a repo called ${repoName}. \nTry a different repo name.\n`
-                    )
-                )
-                cli({ reset: false, provider: provider })
-                return
-            } else {
-                console.error(
-                    chalk.red(
-                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}\n`
-                    )
-                )
-                cli({ reset: true, provider: provider })
-                return
-            }
+            handleError(e, provider, repoName)
+            return
         }
     }
 
@@ -151,34 +115,8 @@ const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         try {
             res = await githubCreate(credentials.Github, repoName)
         } catch (e) {
-            if (e.response.status === 401) {
-                console.error(chalk.red('wrong login credentials\n'))
-                cli({ reset: true, provider: provider })
-                return
-            } else if (e.response.status === 422) {
-                console.error(
-                    chalk.red(
-                        `You already have a repo called ${repoName}\nTry a different repo name.\n`
-                    )
-                )
-                cli({ reset: false, provider: provider })
-                return
-            } else if (e.response.status === 403) {
-                console.error(
-                    chalk.red(
-                        `Request limit exceeded.  Try again in one hour.\n`
-                    )
-                )
-                return
-            } else {
-                console.error(
-                    chalk.red(
-                        `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.message}\n`
-                    )
-                )
-                cli({ reset: true, provider: provider })
-                return
-            }
+            handleError(e, provider, repoName)
+            return
         }
     }
 

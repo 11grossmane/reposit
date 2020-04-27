@@ -1,6 +1,7 @@
 import fs from 'fs'
 import yaml from 'js-yaml'
-import axios from 'axios'
+import chalk from 'chalk'
+import axios, { AxiosError } from 'axios'
 import {
     Credentials,
     Provider,
@@ -14,6 +15,7 @@ import {
     GithubCredentials
 } from './types'
 import slugify from 'slugify'
+import { cli } from './index'
 
 export const clearCache = (): void => {
     fs.writeFileSync(DATAPATH, '')
@@ -115,6 +117,70 @@ export const bitbucketCreate = async (
         throw e
     }
 }
+
+const axiosErrorTypeGuard = (tbd: any): any => {
+    if ('response' in tbd) {
+        tbd = <AxiosError>tbd
+    }
+    return false
+}
+
+export const throwUnknownError = (
+    provider: Provider,
+    credentials: Credentials
+) => {
+    let err = new Error(
+        `Unknown Error with provider ${provider} and credentials ${credentials}`
+    )
+    err.name = 'Unknown'
+    throw err
+}
+
+export const handleError = (
+    e: any = {} as AxiosError,
+    provider: Provider,
+    repoName: string = ''
+) => {
+    if (e.name && e.name === 'Unknown') {
+        console.error(chalk.red(e))
+        cli({ reset: true, provider: provider })
+        return
+    } else if (e.response.status === 400) {
+        console.error(
+            chalk.red(
+                `You already have a repo called ${repoName}. \nTry a different repo name.\n`
+            )
+        )
+        cli({ reset: false, provider: provider })
+        return
+    } else if (e.response.status === 401) {
+        console.error(chalk.red('wrong login credentials\n'))
+        cli({ reset: true, provider: provider })
+        return
+    } else if (e.response.status === 422) {
+        console.error(
+            chalk.red(
+                `You already have a repo called ${repoName}\nTry a different repo name.\n`
+            )
+        )
+        cli({ reset: false, provider: provider })
+        return
+    } else if (e.response.status === 403) {
+        console.error(
+            chalk.red(`Request limit exceeded.  Try again in one hour.\n`)
+        )
+        return
+    } else {
+        console.error(
+            chalk.red(
+                `something went wrong with status ${e.response.status}, try again\nmessage: ${e.response.data.error}\n`
+            )
+        )
+        cli({ reset: true, provider: provider })
+        return
+    }
+}
+
 export const githubCreate = async (
     credentials: GithubCredentials,
     repoName: string
