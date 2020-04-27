@@ -25,6 +25,10 @@ export enum Provider {
 
 export const GITHUB_REPO_URL = 'https://api.github.com/user/repos'
 
+export const GITHUB_LOGIN_URL = 'https://api.github.com/user'
+
+export const BITBUCKET_LOGIN_URL = 'https://api.bitbucket.org/2.0/user'
+
 export const BITBUCKET_URL = (username: string, repoName: string): string => {
     return `https://api.bitbucket.org/2.0/repositories/${username}/${repoName}`
 }

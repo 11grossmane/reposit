@@ -9,6 +9,8 @@ import {
     BitbucketCredentials,
     PostResponse,
     GITHUB_REPO_URL,
+    BITBUCKET_LOGIN_URL,
+    GITHUB_LOGIN_URL,
     GithubCredentials
 } from './types'
 import slugify from 'slugify'
@@ -62,6 +64,29 @@ export const hasCredentials = (
         return false
     }
     return true
+}
+
+export const validateCredentials = async (
+    credentials: BitbucketCredentials | GithubCredentials,
+    provider: Provider
+) => {
+    try {
+        let url: string = ''
+        if (provider === Provider.BITBUCKET) {
+            url = BITBUCKET_LOGIN_URL
+        } else if (provider === Provider.GITHUB) {
+            url = GITHUB_LOGIN_URL
+        }
+        let res = await axios.get(url, {
+            auth: {
+                username: credentials.username,
+                password: credentials.password
+            }
+        })
+    } catch (e) {
+        console.log('error status is ', e.response.status)
+        throw e
+    }
 }
 
 //error was because slug was uppercase
