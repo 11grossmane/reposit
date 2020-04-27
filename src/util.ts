@@ -6,7 +6,7 @@ import {
     Credentials,
     Provider,
     DATAPATH,
-    BITBUCKET_URL,
+    BITBUCKET_REPO_URL,
     BitbucketCredentials,
     PostResponse,
     GITHUB_REPO_URL,
@@ -16,6 +16,7 @@ import {
 } from './types'
 import slugify from 'slugify'
 import { cli } from './index'
+import { GITHUB_DELETE_URL } from './types'
 
 export const clearCache = (): void => {
     fs.writeFileSync(DATAPATH, '')
@@ -99,7 +100,7 @@ export const bitbucketCreate = async (
     const slugifiedRepoName = slugify(repoName.toLowerCase())
     try {
         const { data, status } = await axios.post(
-            BITBUCKET_URL(credentials.username, slugifiedRepoName),
+            BITBUCKET_REPO_URL(credentials.username, slugifiedRepoName),
             null,
             {
                 auth: {
@@ -204,6 +205,43 @@ export const githubCreate = async (
             links: [data.clone_url, data.ssh_url],
             statusCode: status
         }
+    } catch (e) {
+        throw e
+    }
+}
+
+export const githubDelete = async (
+    credentials: GithubCredentials,
+    repoName: string
+) => {
+    try {
+        const url = GITHUB_DELETE_URL(credentials.username, repoName)
+        const { status } = await axios.delete(url, {
+            auth: {
+                username: credentials.username,
+                password: credentials.password
+            }
+        })
+        if (status === 204)
+            return `${repoName} successfully deleted from Github`
+    } catch (e) {
+        throw e
+    }
+}
+export const bitbucketDelete = async (
+    credentials: GithubCredentials,
+    repoName: string
+) => {
+    try {
+        const url = BITBUCKET_REPO_URL(credentials.username, repoName)
+        const { status } = await axios.delete(url, {
+            auth: {
+                username: credentials.username,
+                password: credentials.password
+            }
+        })
+        if (status === 204)
+            return `${repoName} successfully deleted from Bitbucket`
     } catch (e) {
         throw e
     }

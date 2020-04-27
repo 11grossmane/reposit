@@ -2,6 +2,7 @@ export interface Answers {
     username?: string
     password?: string
     repoName: string
+    delete?: boolean
 }
 
 export interface Credentials {
@@ -29,8 +30,18 @@ export const GITHUB_LOGIN_URL = 'https://api.github.com/user'
 
 export const BITBUCKET_LOGIN_URL = 'https://api.bitbucket.org/2.0/user'
 
-export const BITBUCKET_URL = (username: string, repoName: string): string => {
+export const BITBUCKET_REPO_URL = (
+    username: string,
+    repoName: string
+): string => {
     return `https://api.bitbucket.org/2.0/repositories/${username}/${repoName}`
+}
+
+export const GITHUB_DELETE_URL = (
+    username: string,
+    repoName: string
+): string => {
+    return `https://api.github.com/repos/${username}/${repoName}`
 }
 
 export interface PostResponse {

@@ -9,7 +9,8 @@ import {
     Credentials,
     Answers,
     PostResponse,
-    InternalArgs
+    InternalArgs,
+    GithubCredentials
 } from './types'
 import {
     checkCache,
@@ -19,9 +20,11 @@ import {
     validateCredentials,
     githubCreate,
     handleError,
-    throwUnknownError
+    throwUnknownError,
+    bitbucketDelete,
+    githubDelete
 } from './util'
-import { loginQuestions, repoNameQuestion } from './questions'
+import { loginQuestions, repoNameQuestion, deleteQuestions } from './questions'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
 
@@ -31,6 +34,7 @@ commander
     .option('-g, --github', 'set remote to github')
     .option('-b, --bitbucket', 'set remote to bitbucket')
     .option('-r, --reset', 'remove login credentials from cache')
+    .option('-d,--delete', 'delete named repo')
     .parse(process.argv)
 
 export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
@@ -92,14 +96,69 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         )
     )
 
-    //asking for repo name
-    let { repoName } = await repoNameQuestion(provider)
-
     //Typecasting to make sure credentials is not null
     credentials = <Credentials>credentials
 
-    let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
+    //asking for repo name
+    let { repoName } = commander.delete
+        ? await repoNameQuestion(provider, 'delete')
+        : await repoNameQuestion(provider)
 
+    //delete flow
+
+    //Provider is github
+    if (commander.delete) {
+        let answers = await deleteQuestions(provider, repoName)
+        if (
+            answers.delete &&
+            provider === Provider.GITHUB &&
+            credentials?.Github
+        ) {
+            try {
+                const response = await githubDelete(
+                    credentials.Github,
+                    repoName
+                )
+                console.log(chalk.green(response))
+                return
+            } catch (e) {
+                handleError(e, provider)
+                return
+            }
+        }
+
+        //Provider is bitbucket
+        else if (
+            answers.delete &&
+            provider == Provider.BITBUCKET &&
+            credentials?.Bitbucket
+        ) {
+            try {
+                const response = await bitbucketDelete(
+                    credentials.Bitbucket,
+                    repoName
+                )
+                console.log(chalk.green(response))
+                return
+            } catch (e) {
+                handleError(e, provider)
+                return
+            }
+        } else if (answers.delete == false) {
+            return
+        } else {
+            try {
+                throwUnknownError(provider, credentials)
+            } catch (e) {
+                handleError(e, provider)
+                return
+            }
+        }
+    }
+
+    //create flow
+
+    let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
     //Provider is Bitbucket
     if (provider == Provider.BITBUCKET && credentials.Bitbucket) {
         try {
