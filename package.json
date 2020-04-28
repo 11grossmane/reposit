@@ -1,13 +1,13 @@
 {
     "name": "reposit",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "description": "",
     "main": "./lib/index.js",
     "bin": {
         "reposit": "./lib/index.js"
     },
     "files": [
-        "/lib/**/*",
+        "lib/**/*",
         "data/"
     ],
     "repository": {

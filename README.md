@@ -1,8 +1,7 @@
 # reposit
+- Create remote repositories from the command line
 
 [![Build Status](https://travis-ci.org/11grossmane/reposit.svg?branch=master)](https://travis-ci.org/11grossmane/reposit)
-
-> Create remote repositories from the command line
 
 ![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
 
