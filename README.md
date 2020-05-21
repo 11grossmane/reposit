@@ -1,7 +1,12 @@
 # reposit ![build](https://travis-ci.org/11grossmane/reposit.svg?branch=master&raw=true)
 
 -   Create remote repositories from the command line
--   Stores login information on your own computer. I do not store any credentials.
+
+<br>
+
+> **Stores login information on your own computer. I do not store any credentials.**
+
+<br>
 
 ![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
 
