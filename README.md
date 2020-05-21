@@ -1,7 +1,7 @@
 # reposit ![build](https://travis-ci.org/11grossmane/reposit.svg?branch=master&raw=true)
-- Create remote repositories from the command line
 
-
+-   Create remote repositories from the command line
+-   Stores login information on your own computer. I do not store any credentials.
 
 ![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
 
@@ -15,10 +15,11 @@ npm i -g reposit
 
 > \*\*Note: reposit currently only supports Github and Bitbucket,
 > and therefore must be run with -g flag, or -b flag
-- -b create bitbucket repo
-- -g create github repo
-- -r reset login credentials
-- -d delete repo (use with -g or -b to specify provider) 
+
+-   -b create bitbucket repo
+-   -g create github repo
+-   -r reset login credentials
+-   -d delete repo (use with -g or -b to specify provider)
 
 #### Create Github Repo
 
