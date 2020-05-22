@@ -8,7 +8,8 @@
 
 <br>
 
-![reposit-screenshot](https://github.com/11grossmane/reposit/blob/master/reposit-example-usage-edited.png?raw=true)
+![reposit-create](https://github.com/11grossmane/reposit/blob/master/repositcreate.png?raw=true)
+![reposit-delete](https://github.com/11grossmane/reposit/blob/master/repositdelete.png?raw=true)
 
 ## Install
 
@@ -52,7 +53,7 @@ reposit -b -d
 
 #### Resetting Login Information
 
-> When you run reposit for the first time with -g or -b, it will take you through a flow where you add your login information, which is then cached on your machine so you don't have to log in everytime. But if you want to reset your info, just run reposit with the -r flag
+> When you run reposit for the first time with -g or -b, it will take you through a flow where you add your login information, which is, if you choose, encrypted and stored on your machine so you don't have to log in everytime. But if you want to reset your info, just run reposit with the -r flag
 
 ###### Example
 
