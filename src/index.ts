@@ -26,6 +26,7 @@ import {
 } from './util'
 import { loginQuestions, repoNameQuestion, deleteQuestions, storeQuestion } from './questions'
 import inquirer from 'inquirer'
+import { clearCache } from './util'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
 
@@ -60,8 +61,11 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         }
     }
 
+    //if reset is true wipe credentials
+    reset && (await clearCache())
+
     console.log(`your remote provider is set to: ${provider}\n`)
-    let credentials = checkCache()
+    let credentials = await checkCache()
 
     //If user does not have cached credentials, or he has used -r flag, ask for credential and then cache them
     if (!hasCredentials(credentials, provider, reset)) {
@@ -88,7 +92,7 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
 
         const storeAnswer = await storeQuestion()
 
-        storeAnswer.storeLocally && writeToCache(credentials)
+        storeAnswer.storeLocally && (await writeToCache(credentials))
     }
 
     //otherwise, only ask for repo name
@@ -109,10 +113,10 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         : await repoNameQuestion(provider)
 
     //delete flow
-
-    //Provider is github
     if (commander.delete) {
         let answers = await deleteQuestions(provider, repoName)
+
+        //Provider is github
         if (answers.delete && provider === Provider.GITHUB && credentials?.Github) {
             try {
                 const response = await githubDelete(credentials.Github, repoName)

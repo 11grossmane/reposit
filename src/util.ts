@@ -19,17 +19,23 @@ import slugify from 'slugify'
 import { cli } from './index'
 import Cryptr = require('cryptr')
 import { machineIdSync } from 'node-machine-id'
+import util = require('util')
+
+const writeFile = util.promisify(fs.writeFile)
+const readFile = util.promisify(fs.readFile)
 
 const key = machineIdSync()
 const cryptr = new Cryptr(key)
 
-export const clearCache = (): void => {
-    fs.writeFileSync(DATAPATH, '')
+export const clearCache = async (): Promise<void> => {
+    await writeFile(DATAPATH, '')
 }
 
-export const checkCache = (): Credentials | null => {
+export const checkCache = async (): Promise<Credentials | null> => {
     try {
-        const credentials: Credentials = yaml.safeLoad(fs.readFileSync(DATAPATH, 'utf8'))
+        const credentials: Credentials = yaml.safeLoad(
+            await readFile(DATAPATH, { encoding: 'utf8' })
+        )
         return decryptCredentials(credentials)
     } catch (e) {
         return null
@@ -58,8 +64,8 @@ export const encryptCredentials = (creds: Credentials): Credentials => {
     return result
 }
 
-export const writeToCache = (newCredentials: Credentials): void => {
-    let oldCredentials = checkCache()
+export const writeToCache = async (newCredentials: Credentials): Promise<void> => {
+    let oldCredentials = await checkCache()
     let oldEncryptedCredentials = encryptCredentials(oldCredentials)
     let newEncryptedCredentials = encryptCredentials(newCredentials)
     if (oldCredentials) {
@@ -72,11 +78,11 @@ export const writeToCache = (newCredentials: Credentials): void => {
                 noRefs: true
             }
         )
-        fs.writeFileSync(DATAPATH, yamlString)
+        await writeFile(DATAPATH, yamlString)
         return
     }
     const yamlString = yaml.safeDump(newEncryptedCredentials)
-    fs.writeFileSync(DATAPATH, yamlString)
+    await writeFile(DATAPATH, yamlString)
 }
 
 export const hasCredentials = (
