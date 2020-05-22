@@ -1,12 +1,14 @@
 import { Credentials, Provider, BitbucketCredentials, PostResponse, GithubCredentials } from './types';
 export declare const clearCache: () => void;
-export declare const checkCache: () => Credentials | null;
+export declare const checkCache: () => Credentials;
+export declare const decryptCredentials: (creds: Credentials) => Credentials;
+export declare const encryptCredentials: (creds: Credentials) => Credentials;
 export declare const writeToCache: (newCredentials: Credentials) => void;
-export declare const hasCredentials: (credentials: Credentials | null, provider: Provider, reset: boolean) => boolean;
+export declare const hasCredentials: (credentials: Credentials, provider: Provider, reset: boolean) => boolean;
 export declare const validateCredentials: (credentials: GithubCredentials | BitbucketCredentials, provider: Provider) => Promise<void>;
 export declare const bitbucketCreate: (credentials: BitbucketCredentials, repoName: string) => Promise<PostResponse>;
 export declare const throwUnknownError: (provider: Provider, credentials: Credentials) => never;
 export declare const handleError: (e: any, provider: Provider, repoName?: string) => void;
 export declare const githubCreate: (credentials: GithubCredentials, repoName: string) => Promise<PostResponse>;
-export declare const githubDelete: (credentials: GithubCredentials, repoName: string) => Promise<string | undefined>;
-export declare const bitbucketDelete: (credentials: GithubCredentials, repoName: string) => Promise<string | undefined>;
+export declare const githubDelete: (credentials: GithubCredentials, repoName: string) => Promise<string>;
+export declare const bitbucketDelete: (credentials: GithubCredentials, repoName: string) => Promise<string>;

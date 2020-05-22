@@ -3,18 +3,22 @@ export interface Answers {
     password?: string
     repoName: string
     delete?: boolean
+    storeLocally?: boolean
 }
 
 export interface Credentials {
+    [index: string]: GithubCredentials | BitbucketCredentials | undefined
     Github?: GithubCredentials
     Bitbucket?: BitbucketCredentials
 }
 
 export interface GithubCredentials {
+    [index: string]: string
     username: string
     password: string
 }
 export interface BitbucketCredentials {
+    [index: string]: string
     username: string
     password: string
 }
@@ -30,17 +34,11 @@ export const GITHUB_LOGIN_URL = 'https://api.github.com/user'
 
 export const BITBUCKET_LOGIN_URL = 'https://api.bitbucket.org/2.0/user'
 
-export const BITBUCKET_REPO_URL = (
-    username: string,
-    repoName: string
-): string => {
+export const BITBUCKET_REPO_URL = (username: string, repoName: string): string => {
     return `https://api.bitbucket.org/2.0/repositories/${username}/${repoName}`
 }
 
-export const GITHUB_DELETE_URL = (
-    username: string,
-    repoName: string
-): string => {
+export const GITHUB_DELETE_URL = (username: string, repoName: string): string => {
     return `https://api.github.com/repos/${username}/${repoName}`
 }
 

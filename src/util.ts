@@ -12,11 +12,16 @@ import {
     GITHUB_REPO_URL,
     BITBUCKET_LOGIN_URL,
     GITHUB_LOGIN_URL,
+    GITHUB_DELETE_URL,
     GithubCredentials
 } from './types'
 import slugify from 'slugify'
 import { cli } from './index'
-import { GITHUB_DELETE_URL } from './types'
+import Cryptr = require('cryptr')
+import { machineIdSync } from 'node-machine-id'
+
+const key = machineIdSync()
+const cryptr = new Cryptr(key)
 
 export const clearCache = (): void => {
     fs.writeFileSync(DATAPATH, '')
@@ -24,22 +29,44 @@ export const clearCache = (): void => {
 
 export const checkCache = (): Credentials | null => {
     try {
-        const credentials: Credentials = yaml.safeLoad(
-            fs.readFileSync(DATAPATH, 'utf8')
-        )
-        return credentials
+        const credentials: Credentials = yaml.safeLoad(fs.readFileSync(DATAPATH, 'utf8'))
+        return decryptCredentials(credentials)
     } catch (e) {
         return null
     }
 }
 
+export const decryptCredentials = (creds: Credentials): Credentials => {
+    let result: Credentials = {}
+    for (let key in creds) {
+        result[key] = {
+            username: cryptr.decrypt(creds[key].username),
+            password: cryptr.decrypt(creds[key].password)
+        }
+    }
+    return result
+}
+
+export const encryptCredentials = (creds: Credentials): Credentials => {
+    let result: Credentials = {}
+    for (let key in creds) {
+        result[key] = {
+            username: cryptr.encrypt(creds[key].username),
+            password: cryptr.encrypt(creds[key].password)
+        }
+    }
+    return result
+}
+
 export const writeToCache = (newCredentials: Credentials): void => {
     let oldCredentials = checkCache()
+    let oldEncryptedCredentials = encryptCredentials(oldCredentials)
+    let newEncryptedCredentials = encryptCredentials(newCredentials)
     if (oldCredentials) {
         const yamlString = yaml.safeDump(
             {
-                ...oldCredentials,
-                ...newCredentials
+                ...oldEncryptedCredentials,
+                ...newEncryptedCredentials
             },
             {
                 noRefs: true
@@ -48,7 +75,7 @@ export const writeToCache = (newCredentials: Credentials): void => {
         fs.writeFileSync(DATAPATH, yamlString)
         return
     }
-    const yamlString = yaml.safeDump(newCredentials)
+    const yamlString = yaml.safeDump(newEncryptedCredentials)
     fs.writeFileSync(DATAPATH, yamlString)
 }
 
@@ -126,13 +153,8 @@ const axiosErrorTypeGuard = (tbd: any): any => {
     return false
 }
 
-export const throwUnknownError = (
-    provider: Provider,
-    credentials: Credentials
-) => {
-    let err = new Error(
-        `Unknown Error with provider ${provider} and credentials ${credentials}`
-    )
+export const throwUnknownError = (provider: Provider, credentials: Credentials) => {
+    let err = new Error(`Unknown Error with provider ${provider} and credentials ${credentials}`)
     err.name = 'Unknown'
     throw err
 }
@@ -148,9 +170,7 @@ export const handleError = (
         return
     } else if (e.response.status === 400) {
         console.error(
-            chalk.red(
-                `You already have a repo called ${repoName}. \nTry a different repo name.\n`
-            )
+            chalk.red(`You already have a repo called ${repoName}. \nTry a different repo name.\n`)
         )
         cli({ reset: false, provider: provider })
         return
@@ -160,16 +180,12 @@ export const handleError = (
         return
     } else if (e.response.status === 422) {
         console.error(
-            chalk.red(
-                `You already have a repo called ${repoName}\nTry a different repo name.\n`
-            )
+            chalk.red(`You already have a repo called ${repoName}\nTry a different repo name.\n`)
         )
         cli({ reset: false, provider: provider })
         return
     } else if (e.response.status === 403) {
-        console.error(
-            chalk.red(`Request limit exceeded.  Try again in one hour.\n`)
-        )
+        console.error(chalk.red(`Request limit exceeded.  Try again in one hour.\n`))
         return
     } else {
         console.error(
@@ -210,10 +226,7 @@ export const githubCreate = async (
     }
 }
 
-export const githubDelete = async (
-    credentials: GithubCredentials,
-    repoName: string
-) => {
+export const githubDelete = async (credentials: GithubCredentials, repoName: string) => {
     try {
         const url = GITHUB_DELETE_URL(credentials.username, repoName)
         const { status } = await axios.delete(url, {
@@ -222,16 +235,12 @@ export const githubDelete = async (
                 password: credentials.password
             }
         })
-        if (status === 204)
-            return `${repoName} successfully deleted from Github`
+        if (status === 204) return `${repoName} successfully deleted from Github`
     } catch (e) {
         throw e
     }
 }
-export const bitbucketDelete = async (
-    credentials: GithubCredentials,
-    repoName: string
-) => {
+export const bitbucketDelete = async (credentials: GithubCredentials, repoName: string) => {
     try {
         const url = BITBUCKET_REPO_URL(credentials.username, repoName)
         const { status } = await axios.delete(url, {
@@ -240,8 +249,7 @@ export const bitbucketDelete = async (
                 password: credentials.password
             }
         })
-        if (status === 204)
-            return `${repoName} successfully deleted from Bitbucket`
+        if (status === 204) return `${repoName} successfully deleted from Bitbucket`
     } catch (e) {
         throw e
     }

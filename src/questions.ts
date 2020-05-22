@@ -16,34 +16,13 @@ export const loginQuestions = async (provider: Provider): Promise<Answers> => {
     ])
 }
 
-// export const questionsWithLogin = async (
-//     provider: Provider
-// ): Promise<Answers> => {
-//     return await inquirer.prompt([
-//         {
-//             name: 'username',
-//             message: `${provider} username: `,
-//             type: 'input'
-//         },
-//         {
-//             name: 'password',
-//             message: `${provider} password: `,
-//             type: 'password'
-//         },
-//         {
-//             name: 'repoName',
-//             message: `What is the name of your new ${provider} repo?`,
-//             type: 'input'
-//         }
-//     ])
-// }
 export const repoNameQuestion = async (
     provider: Provider,
     toDelete: 'delete' | '' = ''
 ): Promise<Answers> => {
     let message = `What is the name of your new ${provider} repo?`
     if (toDelete === 'delete') {
-        message = `What is the name of the repo you would like to \x1b[31mdelete\x1b[0m\u001b[1m from ${provider}`
+        message = `What is the name of the repo you would like to \x1b[31mdelete\x1b[0m\u001b[1m from ${provider}?`
     }
     return await inquirer.prompt([
         {
@@ -54,10 +33,17 @@ export const repoNameQuestion = async (
     ])
 }
 
-export const deleteQuestions = async (
-    provider: Provider,
-    repoName: string
-): Promise<Answers> => {
+export const storeQuestion = async (): Promise<Answers> => {
+    return await inquirer.prompt([
+        {
+            name: 'storeLocally',
+            message: `Do you want to store encrypted credentials on your device for auto-login?`,
+            type: 'confirm'
+        }
+    ])
+}
+
+export const deleteQuestions = async (provider: Provider, repoName: string): Promise<Answers> => {
     return await inquirer.prompt([
         {
             name: 'delete',

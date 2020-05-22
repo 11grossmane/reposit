@@ -24,7 +24,8 @@ import {
     bitbucketDelete,
     githubDelete
 } from './util'
-import { loginQuestions, repoNameQuestion, deleteQuestions } from './questions'
+import { loginQuestions, repoNameQuestion, deleteQuestions, storeQuestion } from './questions'
+import inquirer from 'inquirer'
 
 console.log(chalk.blue(figlet.textSync('Reposit\n')))
 
@@ -84,7 +85,10 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             handleError(e, provider)
             return
         }
-        writeToCache(credentials)
+
+        const storeAnswer = await storeQuestion()
+
+        storeAnswer.storeLocally && writeToCache(credentials)
     }
 
     //otherwise, only ask for repo name
@@ -109,16 +113,9 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     //Provider is github
     if (commander.delete) {
         let answers = await deleteQuestions(provider, repoName)
-        if (
-            answers.delete &&
-            provider === Provider.GITHUB &&
-            credentials?.Github
-        ) {
+        if (answers.delete && provider === Provider.GITHUB && credentials?.Github) {
             try {
-                const response = await githubDelete(
-                    credentials.Github,
-                    repoName
-                )
+                const response = await githubDelete(credentials.Github, repoName)
                 console.log(chalk.green(response))
                 return
             } catch (e) {
@@ -128,16 +125,9 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         }
 
         //Provider is bitbucket
-        else if (
-            answers.delete &&
-            provider == Provider.BITBUCKET &&
-            credentials?.Bitbucket
-        ) {
+        else if (answers.delete && provider == Provider.BITBUCKET && credentials?.Bitbucket) {
             try {
-                const response = await bitbucketDelete(
-                    credentials.Bitbucket,
-                    repoName
-                )
+                const response = await bitbucketDelete(credentials.Bitbucket, repoName)
                 console.log(chalk.green(response))
                 return
             } catch (e) {
@@ -180,11 +170,7 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     }
 
     //Success!
-    console.log(
-        chalk.green(
-            `\nRepo successfully created!\nRepo Name: ${res.repoName}\n`
-        )
-    )
+    console.log(chalk.green(`\nRepo successfully created!\nRepo Name: ${res.repoName}\n`))
     console.log(
         `Set your remote repo with https: \n${chalk.bold(
             `git remote add origin ${res.links[0]}`

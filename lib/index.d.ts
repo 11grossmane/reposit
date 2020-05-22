@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 import { InternalArgs } from './types';
-export declare const cli: (internalArgs?: InternalArgs | undefined) => Promise<void>;
+export declare const cli: (internalArgs?: InternalArgs) => Promise<void>;

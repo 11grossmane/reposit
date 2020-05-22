@@ -1,6 +1,6 @@
 {
     "name": "reposit",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "description": "",
     "main": "./lib/index.js",
     "bin": {
@@ -32,12 +32,15 @@
     "author": "11grossmane",
     "license": "MIT",
     "dependencies": {
+        "@types/cryptr": "^4.0.1",
         "axios": "^0.19.2",
         "chalk": "^4.0.0",
         "commander": "^5.0.0",
+        "cryptr": "^6.0.2",
         "figlet": "^1.3.0",
         "inquirer": "^7.1.0",
         "js-yaml": "^3.13.1",
+        "node-machine-id": "^1.1.12",
         "slugify": "^1.4.0",
         "ts-node": "^8.8.2",
         "typescript": "^3.8.3"

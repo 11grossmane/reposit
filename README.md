@@ -4,7 +4,7 @@
 
 <br>
 
-> **Stores login information on your own computer. I do not store any credentials.**
+> **The prompt will ask you if you would like to store encrypted login credentials on your machine for auto-login. Nothing is stored without your consent.**
 
 <br>
 

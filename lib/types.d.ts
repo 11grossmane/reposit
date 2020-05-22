@@ -3,16 +3,20 @@ export interface Answers {
     password?: string;
     repoName: string;
     delete?: boolean;
+    storeLocally?: boolean;
 }
 export interface Credentials {
+    [index: string]: GithubCredentials | BitbucketCredentials | undefined;
     Github?: GithubCredentials;
     Bitbucket?: BitbucketCredentials;
 }
 export interface GithubCredentials {
+    [index: string]: string;
     username: string;
     password: string;
 }
 export interface BitbucketCredentials {
+    [index: string]: string;
     username: string;
     password: string;
 }
