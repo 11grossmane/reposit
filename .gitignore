@@ -1,4 +1,4 @@
 node_modules/
 .vscode/
 .idea/
-src/github-creds.js
+./src/github_creds.js
