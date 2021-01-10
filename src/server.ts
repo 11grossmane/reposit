@@ -39,6 +39,16 @@ app.get("/github-redirect", async (req, res) => {
             username,
         },
     });
+    res.setHeader("Content-Type", "text/html");
+    res.send(`
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>Authorized</h1>
+    <h2>You can return to your terminal.</h2>
+    </body>
+    </html>
+    `);
     server.close();
 });
 

@@ -64,4 +64,9 @@ export interface InternalArgs {
     provider: Provider;
 }
 
+export interface PathArgs {
+    credentials: Credentials;
+    del: boolean;
+}
+
 export const DATAPATH = __dirname + "/../data/login.yaml";

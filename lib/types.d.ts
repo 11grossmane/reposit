@@ -43,4 +43,8 @@ export interface InternalArgs {
     reset: boolean;
     provider: Provider;
 }
+export interface PathArgs {
+    credentials: Credentials;
+    del: boolean;
+}
 export declare const DATAPATH: string;

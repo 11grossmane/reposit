@@ -17,11 +17,13 @@
     "scripts": {
         "create": "npm run build && npm run global",
         "build": "npm run clean && npm install && tsc -p .",
+        "build-exec": "npm run build && node ./lib/index",
         "global": "npm i -g",
         "github-reset": "ts-node ./src/index.ts -g -r",
         "github": "ts-node ./src/index.ts -g",
         "github-delete": "ts-node ./src/index.ts -g -d",
         "bitbucket": "ts-node ./src/index.ts -b",
+        "bitbucket-delete": "ts-node ./src/index.ts -b -d",
         "bitbucket-reset": "ts-node ./src/index.ts -b -r",
         "clean": "find ./lib ! -name '.gitignore' -type f -exec rm -f {} + && rm -f ./data/login.yaml",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
@@ -47,8 +49,7 @@
         "node-machine-id": "^1.1.12",
         "ora": "^5.2.0",
         "shelljs": "^0.8.4",
-        "slugify": "^1.4.0",
-        "ts-node": "^9.1.1"
+        "slugify": "^1.4.0"
     },
     "devDependencies": {
         "@types/axios": "^0.14.0",
@@ -65,6 +66,7 @@
         "@types/shelljs": "^0.8.8",
         "@types/typescript": "^2.0.0",
         "@types/yaml": "^1.2.0",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "ts-node": "^9.1.1"
     }
 }

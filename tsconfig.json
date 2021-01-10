@@ -6,6 +6,7 @@
         "allowJs": true,
         "declaration": true,
         "outDir": "lib",
+        "rootDir": "src",
         "strict": true,
         "types": ["node"],
         "moduleResolution": "node",
@@ -13,5 +14,4 @@
         "resolveJsonModule": true,
         "strictNullChecks": false
     },
-    "include": ["src"]
 }

@@ -45,9 +45,9 @@ export const checkCache = async (
     decrypt: boolean = true
 ): Promise<Credentials | null> => {
     try {
-        const credentials: Credentials = yaml.safeLoad(
-            await readFile(DATAPATH, { encoding: "utf8" })
-        );
+        const str = await readFile(DATAPATH, { encoding: "utf8" });
+        const credentials: Credentials = yaml.safeLoad(str);
+
         if (!decrypt) return credentials;
         return decryptCredentials(credentials);
     } catch (e) {
@@ -122,8 +122,7 @@ export const writeToCache = async (
 
 export const hasCredentials = (
     credentials: Credentials | null,
-    provider: Provider,
-    reset: boolean
+    provider: Provider
 ): boolean => {
     switch (provider) {
         case Provider.BITBUCKET:
@@ -139,6 +138,19 @@ export const hasCredentials = (
     }
 
     return true;
+};
+
+export const checkGithubAuthExpiration = async (
+    credentials: Credentials
+): Promise<Credentials | undefined> => {
+    if (!credentials?.Github?.access_token) return undefined;
+    try {
+        await getGithubUser(credentials.Github);
+        return credentials;
+    } catch (e) {
+        console.error("credentials expired...reauthorizing");
+        return undefined;
+    }
 };
 
 export const validateCredentials = async (
@@ -158,7 +170,7 @@ export const validateCredentials = async (
             });
         } else if (provider === Provider.GITHUB) {
             shell.exec(
-                `open  'https://github.com/login/oauth/authorize?scope=user+repo&client_id=${clientID}'`
+                `open  'https://github.com/login/oauth/authorize?scope=user+repo+delete_repo&client_id=${clientID}'`
             );
             while (!creds?.Github) {
                 creds = await checkCache();
@@ -251,6 +263,9 @@ export const handleError = (
             chalk.red(`Request limit exceeded.  Try again in one hour.\n`)
         );
         return;
+    } else if (e.response.status === 404) {
+        console.error(chalk.red(`Not found.\n`));
+        return;
     } else {
         console.error(
             chalk.red(
@@ -266,7 +281,7 @@ export const getGithubUser = async (
     credentials: GithubCredentials
 ): Promise<string> => {
     try {
-        console.log("creds in get user", credentials);
+        if (!credentials) throw new Error("no credentials");
         const { data, status } = await axios.get(GITHUB_LOGIN_URL, {
             headers: {
                 Authorization: `Bearer ${credentials.access_token}`,
