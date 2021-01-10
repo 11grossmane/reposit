@@ -35,6 +35,7 @@ import inquirer from "inquirer";
 import { clearCache } from "./util";
 import { Server } from "http";
 import { ChildProcess, spawn } from "child_process";
+import ora from "ora";
 
 console.log(chalk.blue(figlet.textSync("Reposit\n")));
 
@@ -78,11 +79,13 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
     //If user does not have cached credentials, or he has used -r flag, ask for credential and then cache them
     if (!hasCredentials(credentials, provider, reset)) {
         let cp: ChildProcess;
+        const spinner = ora("Authorizing...");
         if (provider === Provider.GITHUB) {
             cp = spawn("ts-node", ["src/server"], {
                 detached: true,
-                stdio: "inherit",
+                stdio: "ignore",
             });
+            spinner.start();
         }
 
         switch (provider) {
@@ -112,6 +115,7 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
                 );
                 cp.kill();
                 await removeFromCache(Provider.GITHUB);
+                spinner.stop();
             } else {
                 throwUnknownError(provider, credentials);
             }
@@ -119,7 +123,13 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
             handleError(e, provider);
             return;
         }
-
+        console.log(
+            chalk.yellow(
+                `You are logged in with the username: ${chalk.green(
+                    `${credentials && credentials[provider]?.username}`
+                )}.  \nIf you would like to change your login credentials, please run again with the -r flag.\n`
+            )
+        );
         const storeAnswer = await storeQuestion();
 
         storeAnswer.storeLocally && (await writeToCache(credentials));

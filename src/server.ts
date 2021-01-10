@@ -1,15 +1,21 @@
 import express from "express";
 import axios from "axios";
 import { getGithubUser, writeToCache } from "./util";
+import jwt from "jsonwebtoken";
 const app = express();
 const port = 9000;
+
+const token = jwt.sign({ app: "reposit" }, "floppydisk");
+console.log(token);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.get("/github-redirect", async (req, res) => {
     const {
         data: { id, sec },
-    } = await axios.get("https://reposit-server.herokuapp.com/creds");
+    } = await axios.get("https://reposit-server.herokuapp.com/creds", {
+        headers: { Authorization: `Bearer ${token}` },
+    });
     const { data } = await axios.post(
         "https://github.com/login/oauth/access_token",
         {
