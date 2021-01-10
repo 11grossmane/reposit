@@ -1,4 +1,4 @@
-import { Credentials, Provider, BitbucketCredentials, PostResponse, GithubCredentials } from './types';
+import { Credentials, Provider, BitbucketCredentials, PostResponse, GithubCredentials } from "./types";
 export declare const clearCache: () => Promise<void>;
 export declare const checkCache: () => Promise<Credentials>;
 export declare const decryptCredentials: (creds: Credentials) => Credentials;

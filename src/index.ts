@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import figlet from 'figlet'
-import chalk from 'chalk'
-import slugify from 'slugify'
-import commander from 'commander'
+import figlet from "figlet";
+import chalk from "chalk";
+import slugify from "slugify";
+import commander from "commander";
 import {
     Provider,
     DATAPATH,
@@ -10,8 +10,8 @@ import {
     Answers,
     PostResponse,
     InternalArgs,
-    GithubCredentials
-} from './types'
+    GithubCredentials,
+} from "./types";
 import {
     checkCache,
     writeToCache,
@@ -22,77 +22,106 @@ import {
     handleError,
     throwUnknownError,
     bitbucketDelete,
-    githubDelete
-} from './util'
-import { loginQuestions, repoNameQuestion, deleteQuestions, storeQuestion } from './questions'
-import inquirer from 'inquirer'
-import { clearCache } from './util'
+    githubDelete,
+    removeFromCache,
+} from "./util";
+import {
+    loginQuestions,
+    repoNameQuestion,
+    deleteQuestions,
+    storeQuestion,
+} from "./questions";
+import inquirer from "inquirer";
+import { clearCache } from "./util";
+import { Server } from "http";
+import { ChildProcess, spawn } from "child_process";
 
-console.log(chalk.blue(figlet.textSync('Reposit\n')))
+console.log(chalk.blue(figlet.textSync("Reposit\n")));
 
 commander
-    .version('1.0.0')
-    .description('create a remote repo!')
-    .option('-g, --github', 'set remote to github')
-    .option('-b, --bitbucket', 'set remote to bitbucket')
-    .option('-r, --reset', 'remove login credentials from cache')
-    .option('-d,--delete', 'delete named repo')
-    .parse(process.argv)
+    .version("1.0.0")
+    .description("create a remote repo!")
+    .option("-g, --github", "set remote to github")
+    .option("-b, --bitbucket", "set remote to bitbucket")
+    .option("-r, --reset", "remove login credentials from cache")
+    .option("-d,--delete", "delete named repo")
+    .parse(process.argv);
 
 export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
-    let provider: Provider
-    let reset: boolean
+    let provider: Provider;
+    let reset: boolean;
     if (internalArgs) {
-        provider = internalArgs.provider
-        reset = internalArgs.reset
+        provider = internalArgs.provider;
+        reset = internalArgs.reset;
     } else {
-        reset = commander.reset
+        reset = commander.reset;
         if (commander.github && !commander.bitbucket) {
-            provider = Provider.GITHUB
+            provider = Provider.GITHUB;
         } else if (commander.bitbucket && !commander.github) {
-            provider = Provider.BITBUCKET
+            provider = Provider.BITBUCKET;
         } else {
             console.log(
                 chalk.yellow(
-                    'please use either the -g flag for github, OR the -b flag for bitbucket.  Use -h flag for more options.'
+                    "please use either the -g flag for github, OR the -b flag for bitbucket.  Use -h flag for more options."
                 )
-            )
-            return
+            );
+            return;
         }
     }
 
     //if reset is true wipe credentials
-    reset && (await clearCache())
+    reset && (await clearCache());
 
-    console.log(`your remote provider is set to: ${provider}\n`)
-    let credentials = await checkCache()
+    console.log(`your remote provider is set to: ${provider}\n`);
+    let credentials = await checkCache();
 
     //If user does not have cached credentials, or he has used -r flag, ask for credential and then cache them
     if (!hasCredentials(credentials, provider, reset)) {
-        const loginAnswers = await loginQuestions(provider)
-
-        credentials = <Credentials>{
-            [provider]: {
-                username: loginAnswers.username,
-                password: loginAnswers.password
-            }
+        let cp: ChildProcess;
+        if (provider === Provider.GITHUB) {
+            cp = spawn("ts-node", ["src/server"], {
+                detached: true,
+                stdio: "inherit",
+            });
+        }
+        const loginAnswers = await loginQuestions(provider);
+        switch (provider) {
+            case Provider.BITBUCKET:
+                credentials = <Credentials>{
+                    Bitbucket: {
+                        username: loginAnswers.username,
+                        password: loginAnswers.password,
+                    },
+                };
+                break;
+            case Provider.GITHUB:
+                credentials = <Credentials>{
+                    Github: {
+                        access_token: "",
+                    },
+                };
         }
         try {
             if (provider === Provider.BITBUCKET && credentials.Bitbucket) {
-                await validateCredentials(credentials.Bitbucket, provider)
+                await validateCredentials(credentials.Bitbucket, provider);
             } else if (provider === Provider.GITHUB && credentials.Github) {
-                await validateCredentials(credentials.Github, provider)
+                credentials = await validateCredentials(
+                    credentials.Github,
+                    provider
+                );
+                cp.kill();
+                await removeFromCache(Provider.GITHUB);
             } else {
-                throwUnknownError(provider, credentials)
+                throwUnknownError(provider, credentials);
             }
         } catch (e) {
-            handleError(e, provider)
-            return
+            handleError(e, provider);
+            return;
         }
 
-        const storeAnswer = await storeQuestion()
+        const storeAnswer = await storeQuestion();
 
-        storeAnswer.storeLocally && (await writeToCache(credentials))
+        storeAnswer.storeLocally && (await writeToCache(credentials));
     }
 
     //otherwise, only ask for repo name
@@ -102,85 +131,103 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
                 `${credentials && credentials[provider]?.username}`
             )}.  \nIf you would like to change your login credentials, please run again with the -r flag.\n`
         )
-    )
+    );
 
     //Typecasting to make sure credentials is not null
-    credentials = <Credentials>credentials
+    credentials = <Credentials>credentials;
 
     //asking for repo name
     let { repoName } = commander.delete
-        ? await repoNameQuestion(provider, 'delete')
-        : await repoNameQuestion(provider)
+        ? await repoNameQuestion(provider, "delete")
+        : await repoNameQuestion(provider);
 
     //delete flow
     if (commander.delete) {
-        let answers = await deleteQuestions(provider, repoName)
+        let answers = await deleteQuestions(provider, repoName);
 
         //Provider is github
-        if (answers.delete && provider === Provider.GITHUB && credentials?.Github) {
+        if (
+            answers.delete &&
+            provider === Provider.GITHUB &&
+            credentials?.Github
+        ) {
             try {
-                const response = await githubDelete(credentials.Github, repoName)
-                console.log(chalk.green(response))
-                return
+                const response = await githubDelete(
+                    credentials.Github,
+                    repoName
+                );
+                console.log(chalk.green(response));
+                return;
             } catch (e) {
-                handleError(e, provider)
-                return
+                handleError(e, provider);
+                return;
             }
         }
 
         //Provider is bitbucket
-        else if (answers.delete && provider == Provider.BITBUCKET && credentials?.Bitbucket) {
+        else if (
+            answers.delete &&
+            provider == Provider.BITBUCKET &&
+            credentials?.Bitbucket
+        ) {
             try {
-                const response = await bitbucketDelete(credentials.Bitbucket, repoName)
-                console.log(chalk.green(response))
-                return
+                const response = await bitbucketDelete(
+                    credentials.Bitbucket,
+                    repoName
+                );
+                console.log(chalk.green(response));
+                return;
             } catch (e) {
-                handleError(e, provider)
-                return
+                handleError(e, provider);
+                return;
             }
         } else if (answers.delete == false) {
-            return
+            return;
         } else {
             try {
-                throwUnknownError(provider, credentials)
+                throwUnknownError(provider, credentials);
             } catch (e) {
-                handleError(e, provider)
-                return
+                handleError(e, provider);
+                return;
             }
         }
     }
 
     //create flow
 
-    let res: PostResponse = { repoName: '', links: [], statusCode: 0 }
+    let res: PostResponse = { repoName: "", links: [], statusCode: 0 };
     //Provider is Bitbucket
     if (provider == Provider.BITBUCKET && credentials.Bitbucket) {
         try {
-            res = await bitbucketCreate(credentials.Bitbucket, repoName)
+            res = await bitbucketCreate(credentials.Bitbucket, repoName);
         } catch (e) {
-            handleError(e, provider, repoName)
-            return
+            handleError(e, provider, repoName);
+            return;
         }
     }
 
     //Provider is Github
     else if (provider == Provider.GITHUB && credentials.Github) {
         try {
-            res = await githubCreate(credentials.Github, repoName)
+            res = await githubCreate(credentials.Github, repoName);
         } catch (e) {
-            handleError(e, provider, repoName)
-            return
+            handleError(e, provider, repoName);
+            return;
         }
     }
 
     //Success!
-    console.log(chalk.green(`\nRepo successfully created!\nRepo Name: ${res.repoName}\n`))
+    console.log(
+        chalk.green(
+            `\nRepo successfully created!\nRepo Name: ${res.repoName}\n`
+        )
+    );
     console.log(
         `Set your remote repo with https: \n${chalk.bold(
             `git remote add origin ${res.links[0]}`
         )} \nOr ssh:\n${chalk.bold(`git remote add origin ${res.links[1]}`)}`
-    )
+    );
 
     //TODO make README.md
-}
-cli()
+};
+cli();
