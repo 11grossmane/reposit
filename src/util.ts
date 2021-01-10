@@ -270,7 +270,7 @@ export const getGithubUser = async (
         console.log("creds in get user", credentials);
         const { data, status } = await axios.get(GITHUB_LOGIN_URL, {
             headers: {
-                Authorization: "Bearer " + credentials.access_token,
+                Authorization: `Bearer ${credentials.access_token}`,
             },
         });
         return data.login;
@@ -291,7 +291,7 @@ export const githubCreate = async (
             },
             {
                 headers: {
-                    Authorization: "Bearer " + credentials.access_token,
+                    Authorization: `Bearer ${credentials.access_token}`,
                 },
             }
         );
@@ -314,7 +314,7 @@ export const githubDelete = async (
         const url = GITHUB_DELETE_URL(credentials.username, repoName);
         const { status } = await axios.delete(url, {
             headers: {
-                Authorization: "Bearer" + credentials.access_token,
+                Authorization: `Bearer ${credentials.access_token}`,
             },
         });
         if (status === 204)

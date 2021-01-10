@@ -20,6 +20,7 @@
         "global": "npm i -g",
         "github-reset": "ts-node ./src/index.ts -g -r",
         "github": "ts-node ./src/index.ts -g",
+        "github-delete": "ts-node ./src/index.ts -g -d",
         "bitbucket": "ts-node ./src/index.ts -b",
         "bitbucket-reset": "ts-node ./src/index.ts -b -r",
         "clean": "find ./lib ! -name '.gitignore' -type f -exec rm -f {} + && rm -f ./data/login.yaml",

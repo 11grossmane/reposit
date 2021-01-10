@@ -84,9 +84,10 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
                 stdio: "inherit",
             });
         }
-        const loginAnswers = await loginQuestions(provider);
+
         switch (provider) {
             case Provider.BITBUCKET:
+                const loginAnswers = await loginQuestions(provider);
                 credentials = <Credentials>{
                     Bitbucket: {
                         username: loginAnswers.username,
