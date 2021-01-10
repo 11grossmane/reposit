@@ -26,6 +26,7 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         reset = internalArgs.reset;
         provider = internalArgs.provider;
     } else {
+        reset = commander.reset;
         if (commander.github && !commander.bitbucket) {
             provider = Provider.GITHUB;
         } else if (commander.bitbucket && !commander.github) {
