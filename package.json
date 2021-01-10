@@ -33,7 +33,6 @@
     "author": "11grossmane",
     "license": "MIT",
     "dependencies": {
-        "@types/cryptr": "^4.0.1",
         "axios": "^0.21.1",
         "chalk": "^4.0.0",
         "child_process": "^1.0.2",
@@ -51,6 +50,7 @@
         "typescript": "^3.8.3"
     },
     "devDependencies": {
+        "@types/cryptr": "^4.0.1",
         "@types/axios": "^0.14.0",
         "@types/chalk": "^2.2.0",
         "@types/commander": "^2.12.2",

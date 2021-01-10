@@ -21,8 +21,7 @@ import Cryptr = require("cryptr");
 import { machineIdSync } from "node-machine-id";
 import util = require("util");
 import shell from "shelljs";
-const { clientID } = require("./github_creds.js");
-import { cache } from "./temp_cache";
+const clientID = "12e328d31a2bc60d5ddd";
 
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);

@@ -1,8 +1,5 @@
 import express from "express";
-import util from "util";
 import axios from "axios";
-import {} from "../lib";
-import { clientID, clientSecret } from "./github_creds";
 import { getGithubUser, writeToCache } from "./util";
 const app = express();
 const port = 9000;
@@ -10,12 +7,14 @@ const port = 9000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.get("/github-redirect", async (req, res) => {
-    console.log("code", req.query["code"]);
+    const {
+        data: { id, sec },
+    } = await axios.get("https://reposit-server.herokuapp.com/creds");
     const { data } = await axios.post(
         "https://github.com/login/oauth/access_token",
         {
-            client_id: clientID,
-            client_secret: clientSecret,
+            client_id: id,
+            client_secret: sec,
             code: req.query["code"],
             accept: "json",
         },
