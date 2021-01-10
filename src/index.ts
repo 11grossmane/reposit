@@ -81,7 +81,7 @@ export const cli = async (internalArgs?: InternalArgs): Promise<void> => {
         let cp: ChildProcess;
         const spinner = ora("Authorizing...");
         if (provider === Provider.GITHUB) {
-            cp = spawn("ts-node", ["src/server"], {
+            cp = spawn("node", ["lib/server"], {
                 detached: true,
                 stdio: "ignore",
             });

@@ -12,8 +12,8 @@ export interface Credentials {
 }
 export interface GithubCredentials {
     [index: string]: string;
-    username: string;
-    password: string;
+    username?: string;
+    access_token: string;
 }
 export interface BitbucketCredentials {
     [index: string]: string;
