@@ -1,6 +1,6 @@
 {
     "name": "reposit",
-    "version": "1.0.23",
+    "version": "1.0.24",
     "description": "",
     "main": "./lib/index.js",
     "bin": {
@@ -17,7 +17,7 @@
     "scripts": {
         "create": "npm run build && npm run global",
         "build": "npm run clean && npm install && tsc -p .",
-        "build-exec": "npm run build && node ./lib/index",
+        "build-exec": "npm run build && node ./lib/index -g -r",
         "global": "npm i -g",
         "github-reset": "ts-node ./src/index.ts -g -r",
         "github": "ts-node ./src/index.ts -g",

@@ -33,14 +33,14 @@ app.get("/github-redirect", async (req, res) => {
 
     let username = await getGithubUser({ access_token: data["access_token"] });
     console.log("username is", username);
-    await writeToCache({
-        Github: {
-            access_token: data["access_token"],
-            username,
-        },
-    });
-    res.setHeader("Content-Type", "text/html");
-    res.send(`
+    try {
+        await writeToCache({
+            Github: {
+                access_token: data["access_token"],
+                username,
+            },
+        });
+        res.send(`
     <!DOCTYPE html>
     <html>
     <body>
@@ -49,6 +49,11 @@ app.get("/github-redirect", async (req, res) => {
     </body>
     </html>
     `);
+    } catch (e) {
+        res.setHeader("Content-Type", "text/html");
+        res.status(500)
+        res.send(e.message)
+    }
     server.close();
 });
 
