@@ -169,8 +169,10 @@ export const validateCredentials = async (
                 },
             });
         } else if (provider === Provider.GITHUB) {
+            let cmd = 'open'
+            if (process.platform === 'linux') cmd = 'sensible-browser'
             shell.exec(
-                `open  'https://github.com/login/oauth/authorize?scope=user+repo+delete_repo&client_id=${clientID}'`
+                `${cmd}  'https://github.com/login/oauth/authorize?scope=user+repo+delete_repo&client_id=${clientID}'`
             );
             while (!creds?.Github) {
                 creds = await checkCache();
