@@ -34,7 +34,7 @@ app.get("/github-redirect", async (req, res) => {
     let username = await getGithubUser({ access_token: data["access_token"] });
     console.log("username is", username);
     try {
-        await writeToCache({
+        writeToCache({
             Github: {
                 access_token: data["access_token"],
                 username,

@@ -19,33 +19,30 @@ import slugify from "slugify";
 import { cli } from "./index";
 import Cryptr = require("cryptr");
 import { machineIdSync } from "node-machine-id";
-import util = require("util");
 import shell from "shelljs";
 const clientID = "12e328d31a2bc60d5ddd";
 
-const writeFile = util.promisify(fs.writeFile);
-const readFile = util.promisify(fs.readFile);
 
 const key = machineIdSync();
 const cryptr = new Cryptr(key);
 
-export const clearCache = async (): Promise<void> => {
-    await writeFile(DATAPATH, "");
+export const clearCache = (): void => {
+    fs.writeFileSync(DATAPATH, "");
 };
 
-export const removeFromCache = async (provider: Provider): Promise<void> => {
-    let oldCredentials = await checkCache(false);
+export const removeFromCache = (provider: Provider): void => {
+    let oldCredentials = checkCache(false);
     let newEncryptedCredentials = oldCredentials;
     delete newEncryptedCredentials[provider];
     const yamlString = yaml.safeDump(newEncryptedCredentials);
-    await writeFile(DATAPATH, yamlString);
+    fs.writeFileSync(DATAPATH, yamlString);
 };
 
-export const checkCache = async (
+export const checkCache = (
     decrypt: boolean = true
-): Promise<Credentials | null> => {
+): Credentials | null => {
     try {
-        const str = await readFile(DATAPATH, { encoding: "utf8" });
+        const str = fs.readFileSync(DATAPATH, { encoding: "utf8" });
         const credentials: Credentials = yaml.safeLoad(str);
 
         if (!decrypt) return credentials;
@@ -97,10 +94,10 @@ export const encryptCredentials = (creds: Credentials): Credentials => {
     return result;
 };
 
-export const writeToCache = async (
+export const writeToCache = (
     newCredentials: Credentials
-): Promise<void> => {
-    let oldCredentials = await checkCache();
+): void => {
+    let oldCredentials = checkCache();
     let oldEncryptedCredentials = encryptCredentials(oldCredentials);
     let newEncryptedCredentials = encryptCredentials(newCredentials);
     if (oldCredentials) {
@@ -113,11 +110,12 @@ export const writeToCache = async (
                 noRefs: true,
             }
         );
-        await writeFile(DATAPATH, yamlString);
+        console.log('datapath is ', DATAPATH)
+        fs.writeFileSync(DATAPATH, yamlString);
         return;
     }
     const yamlString = yaml.safeDump(newEncryptedCredentials);
-    await writeFile(DATAPATH, yamlString);
+    fs.writeFileSync(DATAPATH, yamlString);
 };
 
 export const hasCredentials = (

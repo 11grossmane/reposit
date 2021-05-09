@@ -37,7 +37,7 @@ export const bitbucket = async ({ credentials, del = false }: PathArgs) => {
 
         const storeAnswer = await storeQuestion();
 
-        storeAnswer.storeLocally && (await writeToCache(credentials));
+        storeAnswer.storeLocally && (writeToCache(credentials));
     }
 
     //otherwise, only ask for repo name

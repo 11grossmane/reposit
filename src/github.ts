@@ -29,8 +29,11 @@ export const github = async ({ credentials, del = false }: PathArgs) => {
 
         let cp = spawn(cmd, [executePath], {
             detached: true,
-            stdio: "ignore",
+            shell: true
         });
+        cp.stdout.on('data', (data) => {
+            console.log(data.toString())
+        })
         spinner.start();
 
         setTimeout(() => {
@@ -56,7 +59,7 @@ export const github = async ({ credentials, del = false }: PathArgs) => {
             )
         );
         const storeAnswer = await storeQuestion();
-        storeAnswer.storeLocally && (await writeToCache(credentials));
+        storeAnswer.storeLocally && (writeToCache(credentials));
     } else {
         //otherwise just display login
         console.log(
