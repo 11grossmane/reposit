@@ -11,29 +11,29 @@ console.log(token);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.get("/github-redirect", async (req, res) => {
-    const {
-        data: { id, sec },
-    } = await axios.get("https://reposit-server.herokuapp.com/creds", {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    const { data } = await axios.post(
-        "https://github.com/login/oauth/access_token",
-        {
-            client_id: id,
-            client_secret: sec,
-            code: req.query["code"],
-            accept: "json",
-        },
-        {
-            headers: {
-                Accept: "application/json",
-            },
-        }
-    );
-
-    let username = await getGithubUser({ access_token: data["access_token"] });
-    console.log("username is", username);
     try {
+        const {
+            data: { id, sec },
+        } = await axios.get("https://reposit-server.herokuapp.com/creds", {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const { data } = await axios.post(
+            "https://github.com/login/oauth/access_token",
+            {
+                client_id: id,
+                client_secret: sec,
+                code: req.query["code"],
+                accept: "json",
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                },
+            }
+        );
+
+        let username = await getGithubUser({ access_token: data["access_token"] });
+        console.log("username is", username);
         writeToCache({
             Github: {
                 access_token: data["access_token"],
@@ -52,6 +52,7 @@ app.get("/github-redirect", async (req, res) => {
     } catch (e) {
         res.setHeader("Content-Type", "text/html");
         res.status(500)
+        console.log(e)
         res.send(e.message)
     }
     server.close();

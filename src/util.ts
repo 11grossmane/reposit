@@ -173,7 +173,7 @@ export const validateCredentials = async (
                 `${cmd}  'https://github.com/login/oauth/authorize?scope=user+repo+delete_repo&client_id=${clientID}'`
             );
             while (!creds?.Github) {
-                creds = await checkCache();
+                creds = checkCache();
             }
         }
         return creds;
