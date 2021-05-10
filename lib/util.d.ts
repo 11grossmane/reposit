@@ -1,10 +1,10 @@
 import { Credentials, Provider, BitbucketCredentials, PostResponse, GithubCredentials } from "./types";
-export declare const clearCache: () => Promise<void>;
-export declare const removeFromCache: (provider: Provider) => Promise<void>;
-export declare const checkCache: (decrypt?: boolean) => Promise<Credentials>;
+export declare const clearCache: () => void;
+export declare const removeFromCache: (provider: Provider) => void;
+export declare const checkCache: (decrypt?: boolean) => Credentials;
 export declare const decryptCredentials: (creds: Credentials) => Credentials;
 export declare const encryptCredentials: (creds: Credentials) => Credentials;
-export declare const writeToCache: (newCredentials: Credentials) => Promise<void>;
+export declare const writeToCache: (newCredentials: Credentials) => void;
 export declare const hasCredentials: (credentials: Credentials, provider: Provider) => boolean;
 export declare const checkGithubAuthExpiration: (credentials: Credentials) => Promise<Credentials>;
 export declare const validateCredentials: (credentials: GithubCredentials | BitbucketCredentials, provider: Provider) => Promise<Credentials>;

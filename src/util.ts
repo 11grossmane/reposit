@@ -34,7 +34,7 @@ export const removeFromCache = (provider: Provider): void => {
     let oldCredentials = checkCache(false);
     let newEncryptedCredentials = oldCredentials;
     delete newEncryptedCredentials[provider];
-    const yamlString = yaml.safeDump(newEncryptedCredentials);
+    const yamlString = yaml.dump(newEncryptedCredentials);
     fs.writeFileSync(DATAPATH, yamlString);
 };
 
@@ -110,11 +110,10 @@ export const writeToCache = (
                 noRefs: true,
             }
         );
-        console.log('datapath is ', DATAPATH)
         fs.writeFileSync(DATAPATH, yamlString);
         return;
     }
-    const yamlString = yaml.safeDump(newEncryptedCredentials);
+    const yamlString = yaml.dump(newEncryptedCredentials);
     fs.writeFileSync(DATAPATH, yamlString);
 };
 
@@ -156,6 +155,7 @@ export const validateCredentials = async (
     provider: Provider
 ): Promise<Credentials> => {
     let creds: Credentials;
+    console.log('Validating...')
     try {
         let url: string = "";
         if (provider === Provider.BITBUCKET) {
@@ -172,7 +172,13 @@ export const validateCredentials = async (
             shell.exec(
                 `${cmd}  'https://github.com/login/oauth/authorize?scope=user+repo+delete_repo&client_id=${clientID}'`
             );
+            const start = Date.now()
             while (!creds?.Github) {
+                if (Date.now() - start > 10000) {
+                    console.error('\n request timed-out \n')
+                    break
+                }
+
                 creds = checkCache();
             }
         }

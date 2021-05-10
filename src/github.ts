@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { spawn } from "child_process";
+import { fork } from "child_process";
 import commander from "commander";
 import ora from "ora";
 import path from "path";
@@ -27,13 +27,16 @@ export const github = async ({ credentials, del = false }: PathArgs) => {
         let cmd = base === "src" ? "ts-node" : "node";
         let executePath = base === "src" ? "src/server" : "lib/server";
 
-        let cp = spawn(cmd, [executePath], {
-            detached: true,
-            shell: true
+        let cp = fork('server', [], {
+            cwd: __dirname,
+            stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+            // detached: true,
+            // shell: true
         });
-        cp.stdout.on('data', (data) => {
-            console.log(data.toString())
-        })
+        // remove this comment and shell: true to enable logging for debugging purposes
+        // cp.stdout.on('data', (data) => {
+        //     console.log(data.toString())
+        // })
         spinner.start();
 
         setTimeout(() => {
@@ -43,7 +46,8 @@ export const github = async ({ credentials, del = false }: PathArgs) => {
         try {
             credentials = await validateCredentials(null, provider);
             cp.kill();
-            await removeFromCache(provider);
+            // will re-add credentials later if they do in fact want to store them
+            removeFromCache(provider);
             spinner.stop();
         } catch (e) {
             handleError(e, provider);
@@ -59,7 +63,7 @@ export const github = async ({ credentials, del = false }: PathArgs) => {
             )
         );
         const storeAnswer = await storeQuestion();
-        storeAnswer.storeLocally && (writeToCache(credentials));
+        if (storeAnswer.storeLocally) writeToCache(credentials)
     } else {
         //otherwise just display login
         console.log(

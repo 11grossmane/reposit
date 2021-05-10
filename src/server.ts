@@ -6,7 +6,6 @@ const app = express();
 const port = 9000;
 
 const token = jwt.sign({ app: "reposit" }, "floppydisk");
-console.log(token);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -17,7 +16,7 @@ app.get("/github-redirect", async (req, res) => {
         } = await axios.get("https://reposit-server.herokuapp.com/creds", {
             headers: { Authorization: `Bearer ${token}` },
         });
-        const { data } = await axios.post(
+        const { data, status, } = await axios.post(
             "https://github.com/login/oauth/access_token",
             {
                 client_id: id,
@@ -33,21 +32,20 @@ app.get("/github-redirect", async (req, res) => {
         );
 
         let username = await getGithubUser({ access_token: data["access_token"] });
-        console.log("username is", username);
         writeToCache({
             Github: {
-                access_token: data["access_token"],
-                username,
+                access_token: data['access_token'],
+                username
             },
         });
         res.send(`
-    <!DOCTYPE html>
-    <html>
-    <body>
-    <h1>Authorized</h1>
-    <h2>You can return to your terminal.</h2>
-    </body>
-    </html>
+            <!DOCTYPE html>
+            <html>
+            <body>
+            <h1>Authorized</h1>
+            <h2>You can return to your terminal.</h2>
+            </body>
+            </html>
     `);
     } catch (e) {
         res.setHeader("Content-Type", "text/html");
