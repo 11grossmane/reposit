@@ -57,5 +57,5 @@ app.get("/github-redirect", async (req, res) => {
 });
 
 export const server = app.listen(9000, () => {
-    console.log("listening on 9000");
+    // console.log("listening on 9000");
 });
